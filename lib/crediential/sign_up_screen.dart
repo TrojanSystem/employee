@@ -21,7 +21,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _userNameFocus = FocusNode();
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
-
+  bool _obscureTextForSignup = true;
   final auth = FirebaseAuth.instance;
   final formKey = GlobalKey<FormState>();
   String username = '';
@@ -207,9 +207,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           onSaved: (value) {
                             userPassword = value;
                           },
-                          obscureText: true,
+                          obscureText: _obscureTextForSignup,
                           obscuringCharacter: '*',
                           decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _obscureTextForSignup =
+                                      !_obscureTextForSignup;
+                                });
+                              },
+                              icon: Icon(_obscureTextForSignup
+                                  ? Icons.visibility_off
+                                  : Icons.visibility),
+                            ),
                             labelText: 'Password',
                             hintText: 'Enter the password',
                             filled: true,

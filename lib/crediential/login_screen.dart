@@ -23,6 +23,7 @@ class _LoginDemoState extends State<LoginDemo> {
   final _emailFocus = FocusNode();
   String userEmail = '';
   String userPassword = '';
+  bool _obscureText = true;
   @override
   void dispose() {
     _passFocus.dispose();
@@ -99,7 +100,7 @@ class _LoginDemoState extends State<LoginDemo> {
                           },
                           decoration: InputDecoration(
                             errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.red),
+                              borderSide: const BorderSide(color: Colors.red),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             labelText: 'Email',
@@ -148,9 +149,19 @@ class _LoginDemoState extends State<LoginDemo> {
                           onSaved: (value) {
                             userPassword = value;
                           },
-                          obscureText: true,
+                          obscureText: _obscureText,
                           obscuringCharacter: '*',
                           decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _obscureText = !_obscureText;
+                                });
+                              },
+                              icon: Icon(_obscureText
+                                  ? Icons.visibility_off
+                                  : Icons.visibility),
+                            ),
                             labelText: 'Password',
                             hintText: 'Enter the password',
                             filled: true,
