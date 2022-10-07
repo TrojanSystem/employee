@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:intl/intl.dart';
 
 class DfoOrder extends StatefulWidget {
@@ -10,6 +11,10 @@ class DfoOrder extends StatefulWidget {
 }
 
 class _DfoOrderState extends State<DfoOrder> {
+  String _message, body;
+  String _canSendSMSMessage = 'Check is not run.';
+  List<String> people = ['0923675686', '0917920560'];
+  bool sendDirect = false;
   final formKey = GlobalKey<FormState>();
   String name = '';
   String phoneNumber = '';
@@ -31,6 +36,26 @@ class _DfoOrderState extends State<DfoOrder> {
             dateTime = DateTime.now().toString();
           }
         }));
+  }
+
+  Future<void> _sendSMS(String _messageBody, List<String> number) async {
+    try {
+      String _result = await sendSMS(
+        message: _messageBody,
+        recipients: number,
+        sendDirect: sendDirect,
+      );
+      setState(() => _message = _result);
+    } catch (error) {
+      setState(() => _message = error.toString());
+    }
+  }
+
+  Future<bool> _canSendSMS() async {
+    bool _result = await canSendSMS();
+    setState(() => _canSendSMSMessage =
+        _result ? 'This unit can send SMS' : 'This unit cannot send SMS');
+    return _result;
   }
 
   @override
@@ -389,10 +414,17 @@ class _DfoOrderState extends State<DfoOrder> {
                     'totalAmount': totalAmount,
                     'orderedKilo': orderedKilo,
                     'phoneNumber': phoneNumber,
-                    'date': dateTime
+                    'date': dateTime,
+                    'orderReceivedDate': DateTime.now().toString()
                   });
+
                   Navigator.of(context).pop();
                 }
+                _sendSMS(
+                    '${orderedKilo}kg ለ ${DateFormat.E().format(
+                      DateTime.parse(dateTime),
+                    )}',
+                    people);
               },
               child: Container(
                 margin: const EdgeInsets.fromLTRB(130, 10, 130, 0),

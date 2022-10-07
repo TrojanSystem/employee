@@ -128,18 +128,18 @@ class _OrderScreenState extends State<OrderScreen> {
                 final orderData = order.data.docs;
                 result = orderData
                     .where((element) =>
-                        DateTime.parse(element['date']).year ==
+                        DateTime.parse(element['orderReceivedDate']).year ==
                         DateTime.now().year)
                     .toList();
 
                 var todayMonthFilteredList = result
                     .where((element) =>
-                        DateTime.parse(element['date']).month ==
+                        DateTime.parse(element['orderReceivedDate']).month ==
                         DateTime.now().month)
                     .toList();
                 var dailyOrder = todayMonthFilteredList
                     .where((element) =>
-                        DateTime.parse(element['date']).day ==
+                        DateTime.parse(element['orderReceivedDate']).day ==
                         selectedDayOfMonth)
                     .toList();
 
@@ -236,10 +236,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                     ),
                                     IconButton(
                                       color: Colors.blue,
-                                      onPressed: () => _smsContact(
-                                        context,
-                                        dailyOrder[index]['phoneNumber'],
-                                      ),
+                                      onPressed: () => _smsContact(context,
+                                          dailyOrder[index]['phoneNumber']),
                                       icon: const Icon(
                                         Icons.message_rounded,
                                         size: 40,
