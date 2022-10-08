@@ -2,15 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class ProductionInput extends StatefulWidget {
-  final shopEmployeeEmail;
-  const ProductionInput({this.shopEmployeeEmail});
+class ProductionInputUpdate extends StatefulWidget {
+  final int index;
+  const ProductionInputUpdate({this.index});
 
   @override
-  State<ProductionInput> createState() => _ProductionInputState();
+  State<ProductionInputUpdate> createState() => _ProductionInputUpdateState();
 }
 
-class _ProductionInputState extends State<ProductionInput> {
+class _ProductionInputUpdateState extends State<ProductionInputUpdate> {
   final formKey = GlobalKey<FormState>();
   String bale_5_SP = '';
   String bale_10_SP = '';
@@ -487,8 +487,10 @@ class _ProductionInputState extends State<ProductionInput> {
                 setState(() {
                   if (formKey.currentState.validate()) {
                     formKey.currentState.save();
-                    FirebaseFirestore.instance.collection('DailyShopSell').add({
-                      'employeeEmail': widget.shopEmployeeEmail,
+                    FirebaseFirestore.instance
+                        .collection('DailyShopSell')
+                        .doc(widget.index.toString())
+                        .update({
                       'date': dateTime,
                       'bale_5': bale_5,
                       'bale_5_Sp': bale_5_SP,
@@ -513,7 +515,7 @@ class _ProductionInputState extends State<ProductionInput> {
                 ),
                 child: const Center(
                   child: Text(
-                    'Add',
+                    'Update',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,

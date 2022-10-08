@@ -29,7 +29,7 @@ void main() async {
           create: (BuildContext context) => ExpensesData(),
         ),
       ],
-      child: MaterialApp(
+      child: const MaterialApp(
         debugShowCheckedModeBanner: false,
         home: LoginDemo(),
       ),

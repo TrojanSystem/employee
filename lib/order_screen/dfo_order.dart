@@ -417,14 +417,13 @@ class _DfoOrderState extends State<DfoOrder> {
                     'date': dateTime,
                     'orderReceivedDate': DateTime.now().toString()
                   });
-
+                  _sendSMS(
+                      '${orderedKilo}kg ለ ${DateFormat.E().format(
+                        DateTime.parse(dateTime),
+                      )}',
+                      people);
                   Navigator.of(context).pop();
                 }
-                _sendSMS(
-                    '${orderedKilo}kg ለ ${DateFormat.E().format(
-                      DateTime.parse(dateTime),
-                    )}',
-                    people);
               },
               child: Container(
                 margin: const EdgeInsets.fromLTRB(130, 10, 130, 0),

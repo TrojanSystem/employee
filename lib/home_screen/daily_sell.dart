@@ -19,7 +19,9 @@ class DailySell extends StatefulWidget {
 }
 
 class _DailySellState extends State<DailySell> {
+  List productionData = [];
   List dailySold = [];
+  int updateIndex = 0;
   bool isTapped = true;
   double totalSumation = 0.00;
   bool isNegative = false;
@@ -28,6 +30,7 @@ class _DailySellState extends State<DailySell> {
   int totIncome = 0;
   int totExpectedIncome = 0;
   List result = [];
+  List whoLogged = [];
   @override
   void initState() {
     dailySold;
@@ -44,10 +47,11 @@ class _DailySellState extends State<DailySell> {
     ];
     double _w = MediaQuery.of(context).size.width;
     int columnCount = 2;
-    //final dailyGiven = Provider.of<DataProvider>(context).databaseDataForProduction;
+    final dailyGiven = Provider.of<DataProvider>(context).loggedUserEmail;
+
     final dailyExpense = Provider.of<DataStorage>(context).daysOfMonth;
     dailySold = Provider.of<DataProvider>(context).databaseDataForProduction;
-    // print(dailySold);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(3, 83, 151, 1),
@@ -55,6 +59,7 @@ class _DailySellState extends State<DailySell> {
           'Ada Bread',
           style: storageTitle,
         ),
+        centerTitle: true,
         elevation: 0,
       ),
       body: Column(
@@ -132,8 +137,12 @@ class _DailySellState extends State<DailySell> {
                     ),
                   );
                 }
-                final productionData = snapshot.data.docs;
-                result = productionData
+                productionData = snapshot.data.docs;
+                whoLogged = productionData
+                    .where((element) => element['employeeEmail'] == dailyGiven)
+                    .toList();
+
+                result = whoLogged
                     .where((element) =>
                         DateTime.parse(element['date']).year ==
                         DateTime.now().year)
@@ -709,7 +718,8 @@ class _DailySellState extends State<DailySell> {
             button_1: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (ctx) => const ProductionInput(),
+                  builder: (ctx) =>
+                      ProductionInput(shopEmployeeEmail: dailyGiven),
                 ),
               );
             },
@@ -723,6 +733,7 @@ class _DailySellState extends State<DailySell> {
             },
             button_4: () {}),
       ),
+      drawer: const Drawer(),
     );
   }
 }
