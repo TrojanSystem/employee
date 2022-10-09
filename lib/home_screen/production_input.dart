@@ -12,6 +12,7 @@ class ProductionInput extends StatefulWidget {
 
 class _ProductionInputState extends State<ProductionInput> {
   final formKey = GlobalKey<FormState>();
+  String isWhat = 'sold';
   String bale_5_SP = '';
   String bale_10_SP = '';
   String slice_SP = '';
@@ -487,6 +488,7 @@ class _ProductionInputState extends State<ProductionInput> {
                 if (formKey.currentState.validate()) {
                   formKey.currentState.save();
                   FirebaseFirestore.instance.collection('DailyShopSell').add({
+                    'isWhat': 'sold',
                     'employeeEmail': widget.shopEmployeeEmail,
                     'date': dateTime,
                     'bale_5': bale_5,

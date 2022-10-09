@@ -5,6 +5,8 @@ class DataProvider extends ChangeNotifier {
   String loggedUserEmail = '';
   String totalSoldIncome = '';
   String totalExpectedIncome = '';
+  String totalAppbarSoldIncome = '';
+  String totalAppbarExpectedIncome = '';
 
   final List<Map<String, dynamic>> dailyShopData = [];
 
@@ -12,6 +14,12 @@ class DataProvider extends ChangeNotifier {
     loggedUserEmail = userEmail;
 
     notifyListeners();
+  }
+
+  totalIncome(String sold, String expected) {
+    totalAppbarSoldIncome = sold;
+    totalAppbarExpectedIncome = expected;
+    //notifyListeners();
   }
 
   binders(String totalSold, String expectedIncome) {

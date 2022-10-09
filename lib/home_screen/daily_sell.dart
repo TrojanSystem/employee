@@ -25,19 +25,17 @@ class _DailySellState extends State<DailySell> {
   List productionData = [];
   List dailySold = [];
 
-  var data;
+  var totalExpectedIncome;
   int updateIndex = 0;
   bool isTapped = true;
   double totalSumation = 0.00;
   bool isNegative = false;
   bool isExpanded = false;
   int selectedDayOfMonth = DateTime.now().day;
-  int totIncome = 0;
-  int totExpectedIncome = 0;
 
   @override
   void initState() {
-    data;
+    totalExpectedIncome;
     super.initState();
   }
 
@@ -45,8 +43,11 @@ class _DailySellState extends State<DailySell> {
   Widget build(BuildContext context) {
     double _w = MediaQuery.of(context).size.width;
     int columnCount = 2;
-    final dailyGiven = Provider.of<DataProvider>(context).loggedUserEmail;
-    data = Provider.of<DataProvider>(context);
+    final loggedEmail = Provider.of<DataProvider>(context).loggedUserEmail;
+    final totalExpectedIncome =
+        Provider.of<DataProvider>(context).totalAppbarExpectedIncome;
+    final totalSoldIncome =
+        Provider.of<DataProvider>(context).totalAppbarSoldIncome;
     final dailyExpense = Provider.of<DataStorage>(context).daysOfMonth;
 
     return Scaffold(
@@ -100,14 +101,14 @@ class _DailySellState extends State<DailySell> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Expected Income: ${data.totalExpectedIncome}',
+                            'Expected Income: $totalExpectedIncome',
                             style: dailyIncomeStyle,
                           ),
                           const SizedBox(
                             height: 10,
                           ),
                           Text(
-                            'Tot Sold: ${data.totalSoldIncome}',
+                            'Tot Sold: $totalSoldIncome',
                             style: dailyIncomeStyle,
                           ),
                         ],
@@ -123,7 +124,7 @@ class _DailySellState extends State<DailySell> {
             flex: 6,
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('DailyShopGiven')
+                  .collection('DailyShopSell')
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -135,378 +136,527 @@ class _DailySellState extends State<DailySell> {
                   );
                 }
                 productionData = snapshot.data.docs;
-                whoLogged = productionData
-                    .where((element) => element['seller'] == dailyGiven)
-                    .toList();
+                /*
+                *
+                * GIVEN ITEM
+                *
+                *
+                * */
 
-                result = whoLogged
+                final itemTypeForAdmin = productionData
+                    .where((element) => element['isWhat'] == 'given')
+                    .toList();
+                final whoIsForAdmin = itemTypeForAdmin
+                    .where((element) => element['seller'] == loggedEmail)
+                    .toList();
+                final employeeSoldYearFilterForAdmin = whoIsForAdmin
                     .where((element) =>
-                        DateTime.parse(element['producedDate']).year ==
+                        DateTime.parse(element['givenDate']).year ==
                         DateTime.now().year)
                     .toList();
 
-                var daboMonthlyDelivered = result
-                    .where((element) =>
-                        DateTime.parse(element['producedDate']).month ==
-                        DateTime.now().month)
-                    .toList();
-                var dataEntered = daboMonthlyDelivered
-                    .where((element) =>
-                        DateTime.parse(element['producedDate']).day ==
-                        selectedDayOfMonth)
-                    .toList();
+                var employeeSoldMonthFilterForAdmin =
+                    employeeSoldYearFilterForAdmin
+                        .where((element) =>
+                            DateTime.parse(element['givenDate']).month ==
+                            DateTime.now().month)
+                        .toList();
+                var employeeSoldDayFilterForAdmin =
+                    employeeSoldMonthFilterForAdmin
+                        .where((element) =>
+                            DateTime.parse(element['givenDate']).day ==
+                            selectedDayOfMonth)
+                        .toList();
+                /*
+                *
+                *
+                *
+                *
+                * */
 
-                var totalDailyGivenItemsBale_5 =
-                    dataEntered.map((e) => e['bale_5']).toList();
+                /*
 
-                var totDailyGivenSumBale_5 = 0;
-                for (int xx = 0; xx < totalDailyGivenItemsBale_5.length; xx++) {
-                  totDailyGivenSumBale_5 +=
-                      int.parse(totalDailyGivenItemsBale_5[xx]);
-                }
-                var totalDailyGivenItemsBale_10 =
-                    dataEntered.map((e) => e['bale_10']).toList();
 
-                var totDailyGivenSumBale_10 = 0;
+                  BALE 5 ForAdmin
+                *
+                *
+                *
+                * */
+                var totalEmployeeSoldBale_5ForAdmin =
+                    employeeSoldDayFilterForAdmin
+                        .map((e) => e['bale_5'])
+                        .toList();
+
+                var totalEmployeeSoldSumBale_5ForAdmin = 0;
                 for (int xx = 0;
-                    xx < totalDailyGivenItemsBale_10.length;
+                    xx < totalEmployeeSoldBale_5ForAdmin.length;
                     xx++) {
-                  totDailyGivenSumBale_10 +=
-                      int.parse(totalDailyGivenItemsBale_10[xx]);
+                  totalEmployeeSoldSumBale_5ForAdmin +=
+                      int.parse(totalEmployeeSoldBale_5ForAdmin[xx]);
                 }
-                var totalDailyGivenItemsSlice =
-                    dataEntered.map((e) => e['slice']).toList();
 
-                var totDailyGivenSumSlice = 0;
-                for (int xx = 0; xx < totalDailyGivenItemsSlice.length; xx++) {
-                  totDailyGivenSumSlice +=
-                      int.parse(totalDailyGivenItemsSlice[xx]);
-                }
-                var totalDailyGivenItemsBombolino =
-                    dataEntered.map((e) => e['bombolino']).toList();
+                /*
 
-                var totDailyGivenSumBombolino = 0;
+
+                  BALE 10 ForAdmin
+                *
+                *
+                *
+                * */
+                var totalEmployeeSoldBale_10ForAdmin =
+                    employeeSoldDayFilterForAdmin
+                        .map((e) => e['bale_10'])
+                        .toList();
+
+                var totalEmployeeSoldSumBale_10ForAdmin = 0;
                 for (int xx = 0;
-                    xx < totalDailyGivenItemsBombolino.length;
+                    xx < totalEmployeeSoldBale_10ForAdmin.length;
                     xx++) {
-                  totDailyGivenSumBombolino +=
-                      int.parse(totalDailyGivenItemsBombolino[xx]);
+                  totalEmployeeSoldSumBale_10ForAdmin +=
+                      int.parse(totalEmployeeSoldBale_10ForAdmin[xx]);
                 }
-                final double totalGivenBale_5 = totDailyGivenSumBale_5 *
-                    (dataEntered.isEmpty
-                        ? 0.0
-                        : double.parse(dataEntered.last['bale_5_Sp']));
-                final double totalGivenBale_10 = totDailyGivenSumBale_10 *
-                    (dataEntered.isEmpty
-                        ? 0.0
-                        : double.parse(dataEntered.last['bale_10_Sp']));
-                final double totalGivenSlice = totDailyGivenSumSlice *
-                    (dataEntered.isEmpty
-                        ? 0.0
-                        : double.parse(dataEntered.last['slice_Sp']));
-                final double totalGivenBombolino = totDailyGivenSumBombolino *
-                    (dataEntered.isEmpty
-                        ? 0.0
-                        : double.parse(dataEntered.last['bombolino_Sp']));
-                double totalSumOfShopGiven = totalGivenBale_5 +
-                    totalGivenBale_10 +
-                    totalGivenSlice +
-                    totalGivenBombolino;
+                /*
 
-/*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-* */
 
-                final shopDailySold =
-                    Provider.of<DataProvider>(context).dailyShopData;
-                var currentLoggedIn = shopDailySold
-                    .where((element) => element['employeeEmail'] == dailyGiven)
+                   SLICE ForAdmin
+                *
+                *
+                *
+                * */
+                var totalEmployeeSoldSliceForAdmin =
+                    employeeSoldDayFilterForAdmin
+                        .map((e) => e['slice'])
+                        .toList();
+
+                var totalEmployeeSoldSumSliceForAdmin = 0;
+                for (int xx = 0;
+                    xx < totalEmployeeSoldSliceForAdmin.length;
+                    xx++) {
+                  totalEmployeeSoldSumSliceForAdmin +=
+                      int.parse(totalEmployeeSoldSliceForAdmin[xx]);
+                }
+                /*
+
+
+                 BOMBOLINO ForAdmin
+                *
+                *
+                *
+                * */
+                var totalEmployeeSoldBombolinoForAdmin =
+                    employeeSoldDayFilterForAdmin
+                        .map((e) => e['bombolino'])
+                        .toList();
+
+                var totalEmployeeSoldSumBombolinoForAdmin = 0;
+                for (int xx = 0;
+                    xx < totalEmployeeSoldBombolinoForAdmin.length;
+                    xx++) {
+                  totalEmployeeSoldSumBombolinoForAdmin +=
+                      int.parse(totalEmployeeSoldBombolinoForAdmin[xx]);
+                }
+
+                /*
+                *
+                * TOTAL EXPECTED INCOME BALE_5
+                *
+                *
+                * */
+                final double totalBale_5ForAdmin =
+                    totalEmployeeSoldSumBale_5ForAdmin *
+                        (employeeSoldDayFilterForAdmin.isEmpty
+                            ? 0.0
+                            : double.parse(employeeSoldDayFilterForAdmin
+                                .last['bale_5_Sp']));
+                /*
+                *
+                * TOTAL EXPECTED INCOME BALE_10
+                *
+                *
+                * */
+                final double totalBale_10ForAdmin =
+                    totalEmployeeSoldSumBale_10ForAdmin *
+                        (employeeSoldDayFilterForAdmin.isEmpty
+                            ? 0.0
+                            : double.parse(employeeSoldDayFilterForAdmin
+                                .last['bale_10_Sp']));
+                /*
+                *
+                * TOTAL EXPECTED INCOME SLICE
+                *
+                *
+                * */
+                final double totalSliceForAdmin =
+                    totalEmployeeSoldSumSliceForAdmin *
+                        (employeeSoldDayFilterForAdmin.isEmpty
+                            ? 0.0
+                            : double.parse(employeeSoldDayFilterForAdmin
+                                .last['slice_Sp']));
+                /*
+                *
+                * TOTAL EXPECTED INCOME BOMBOLINO
+                *
+                *
+                * */
+                final double totalBombolinoForAdmin =
+                    totalEmployeeSoldSumBombolinoForAdmin *
+                        (employeeSoldDayFilterForAdmin.isEmpty
+                            ? 0.0
+                            : double.parse(employeeSoldDayFilterForAdmin
+                                .last['bombolino_Sp']));
+
+                /*
+                *
+                * SOLD ITEM
+                *
+                *
+                * */
+                final itemType = productionData
+                    .where((element) => element['isWhat'] == 'sold')
                     .toList();
-
-                final resultShopSold = currentLoggedIn
+                final whoIs = itemType
+                    .where((element) => element['employeeEmail'] == loggedEmail)
+                    .toList();
+                final employeeSoldYearFilter = whoIs
                     .where((element) =>
                         DateTime.parse(element['date']).year ==
                         DateTime.now().year)
-                    .toList()
-                    .toSet();
+                    .toList();
 
-                var currentLoggedInFilteredList = resultShopSold
+                var employeeSoldMonthFilter = employeeSoldYearFilter
                     .where((element) =>
                         DateTime.parse(element['date']).month ==
                         DateTime.now().month)
                     .toList();
-                var dailySoldItems = currentLoggedInFilteredList
+                var employeeSoldDayFilter = employeeSoldMonthFilter
                     .where((element) =>
                         DateTime.parse(element['date']).day ==
                         selectedDayOfMonth)
                     .toList();
+                /*
 
-                var totalDailySoldItemsBale_5 =
-                    dailySoldItems.map((e) => e['bale_5']).toList();
-                print('this ${totalDailySoldItemsBale_5}');
-                var totDailySoldSumBale_5 = 0;
-                for (int xx = 0; xx < totalDailySoldItemsBale_5.length; xx++) {
-                  totDailySoldSumBale_5 +=
-                      int.parse(totalDailySoldItemsBale_5[xx]);
-                }
-                var totalDailySoldItemsBale_10 =
-                    dailySoldItems.map((e) => e['bale_10']).toList();
 
-                var totDailySoldSumBale_10 = 0;
-                for (int xx = 0; xx < totalDailySoldItemsBale_10.length; xx++) {
-                  totDailySoldSumBale_10 +=
-                      int.parse(totalDailySoldItemsBale_10[xx]);
-                }
-                var totalDailySoldItemsSlice =
-                    dailySoldItems.map((e) => e['slice']).toList();
+                  BALE 5
+                *
+                *
+                *
+                * */
+                var totalEmployeeSoldBale_5 =
+                    employeeSoldDayFilter.map((e) => e['bale_5']).toList();
 
-                var totDailySoldSumSlice = 0;
-                for (int xx = 0; xx < totalDailySoldItemsSlice.length; xx++) {
-                  totDailySoldSumSlice +=
-                      int.parse(totalDailySoldItemsSlice[xx]);
+                var totalEmployeeSoldSumBale_5 = 0;
+                for (int xx = 0; xx < totalEmployeeSoldBale_5.length; xx++) {
+                  totalEmployeeSoldSumBale_5 +=
+                      int.parse(totalEmployeeSoldBale_5[xx]);
                 }
-                var totalDailySoldItemsBombolino =
-                    dailySoldItems.map((e) => e['bombolino']).toList();
 
-                var totDailySoldSumBombolino = 0;
-                for (int xx = 0;
-                    xx < totalDailySoldItemsBombolino.length;
-                    xx++) {
-                  totDailySoldSumBombolino +=
-                      int.parse(totalDailySoldItemsBombolino[xx]);
+                /*
+
+
+                  BALE 10
+                *
+                *
+                *
+                * */
+                var totalEmployeeSoldBale_10 =
+                    employeeSoldDayFilter.map((e) => e['bale_10']).toList();
+
+                var totalEmployeeSoldSumBale_10 = 0;
+                for (int xx = 0; xx < totalEmployeeSoldBale_10.length; xx++) {
+                  totalEmployeeSoldSumBale_10 +=
+                      int.parse(totalEmployeeSoldBale_10[xx]);
                 }
-                final double totalBale_5 = totDailySoldSumBale_5 *
-                    (dailySoldItems.isEmpty
+                /*
+
+
+                   SLICE
+                *
+                *
+                *
+                * */
+                var totalEmployeeSoldSlice =
+                    employeeSoldDayFilter.map((e) => e['slice']).toList();
+
+                var totalEmployeeSoldSumSlice = 0;
+                for (int xx = 0; xx < totalEmployeeSoldSlice.length; xx++) {
+                  totalEmployeeSoldSumSlice +=
+                      int.parse(totalEmployeeSoldSlice[xx]);
+                }
+                /*
+
+
+                 BOMBOLINO
+                *
+                *
+                *
+                * */
+                var totalEmployeeSoldBombolino =
+                    employeeSoldDayFilter.map((e) => e['bombolino']).toList();
+
+                var totalEmployeeSoldSumBombolino = 0;
+                for (int xx = 0; xx < totalEmployeeSoldBombolino.length; xx++) {
+                  totalEmployeeSoldSumBombolino +=
+                      int.parse(totalEmployeeSoldBombolino[xx]);
+                }
+                /*
+                *
+                * TOTAL INCOME BALE_5
+                *
+                *
+                * */
+                final double totalBale_5 = totalEmployeeSoldSumBale_5 *
+                    (employeeSoldDayFilter.isEmpty
                         ? 0.0
-                        : double.parse(dailySoldItems.last['bale_5_Sp']));
-                final double totalBale_10 = totDailySoldSumBale_10 *
-                    (dailySoldItems.isEmpty
+                        : double.parse(
+                            employeeSoldDayFilter.last['bale_5_Sp']));
+                /*
+                *
+                * TOTAL INCOME BALE_10
+                *
+                *
+                * */
+                final double totalBale_10 = totalEmployeeSoldSumBale_10 *
+                    (employeeSoldDayFilter.isEmpty
                         ? 0.0
-                        : double.parse(dailySoldItems.last['bale_10_Sp']));
-                final double totalSlice = totDailySoldSumSlice *
-                    (dailySoldItems.isEmpty
+                        : double.parse(
+                            employeeSoldDayFilter.last['bale_10_Sp']));
+                /*
+                *
+                * TOTAL INCOME SLICE
+                *
+                *
+                * */
+                final double totalSlice = totalEmployeeSoldSumSlice *
+                    (employeeSoldDayFilter.isEmpty
                         ? 0.0
-                        : double.parse(dailySoldItems.last['slice_Sp']));
-                final double totalBombolino = totDailySoldSumBombolino *
-                    (dailySoldItems.isEmpty
+                        : double.parse(employeeSoldDayFilter.last['slice_Sp']));
+                /*
+                *
+                * TOTAL INCOME BOMBOLINO
+                *
+                *
+                * */
+                final double totalBombolino = totalEmployeeSoldSumBombolino *
+                    (employeeSoldDayFilter.isEmpty
                         ? 0.0
-                        : double.parse(dailySoldItems.last['bombolino_Sp']));
-                double totalSumOfShop =
-                    totalBale_5 + totalBale_10 + totalSlice + totalBombolino;
+                        : double.parse(
+                            employeeSoldDayFilter.last['bombolino_Sp']));
+
+                /*
+                *
+                *
+                *
+                * Sum of ALL SOLD ITEMS
+                *
+                *
+                *
+                *
+                * */
                 final listOfPrice = [
                   {
                     'image': 'images/bale_5.png',
-                    'sold': '$totDailySoldSumBale_5',
-                    'given': '$totDailyGivenSumBale_5',
+                    'sold': '$totalEmployeeSoldSumBale_5',
+                    'given': '$totalEmployeeSoldSumBale_5ForAdmin',
                   },
                   {
                     'image': 'images/bale_10.png',
-                    'sold': '$totDailySoldSumBale_10',
-                    'given': '$totDailyGivenSumBale_10',
+                    'sold': '$totalEmployeeSoldSumBale_10',
+                    'given': '$totalEmployeeSoldSumBale_10ForAdmin',
                   },
                   {
                     'image': 'images/slice.png',
-                    'sold': '$totDailySoldSumSlice',
-                    'given': '$totDailyGivenSumSlice',
+                    'sold': '$totalEmployeeSoldSumSlice',
+                    'given': '$totalEmployeeSoldSumSliceForAdmin',
                   },
                   {
                     'image': 'images/donut.png',
-                    'sold': '$totDailySoldSumBombolino',
-                    'given': '$totDailyGivenSumBombolino',
+                    'sold': '$totalEmployeeSoldSumBombolino',
+                    'given': '$totalEmployeeSoldSumBombolinoForAdmin',
                   }
                 ];
+                double totalSold =
+                    (totalBale_5 + totalBale_10 + totalSlice + totalBombolino);
+                double expectedIncome = (totalBale_5ForAdmin +
+                    totalBale_10ForAdmin +
+                    totalSliceForAdmin +
+                    totalBombolinoForAdmin);
 
-                return dataEntered.isEmpty
-                    ? Center(
-                        child: Image.asset(
-                          'images/no_order.png',
-                          width: 200,
+                int sumOfSoldItem = (totalEmployeeSoldSumBale_5 +
+                    totalEmployeeSoldSumBale_10 +
+                    totalEmployeeSoldSumSlice +
+                    totalEmployeeSoldSumBombolino);
+                int sumOfGivenItems = (totalEmployeeSoldSumBale_5ForAdmin +
+                    totalEmployeeSoldSumBale_10ForAdmin +
+                    totalEmployeeSoldSumSliceForAdmin +
+                    totalEmployeeSoldSumBombolinoForAdmin);
+                Provider.of<DataProvider>(context).binders(
+                    sumOfSoldItem.toString(), sumOfGivenItems.toString());
+                Provider.of<DataProvider>(context).totalIncome(
+                    totalSold.toString(), expectedIncome.toString());
+                return snapshot.connectionState == ConnectionState.waiting
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.blue,
+                          strokeWidth: 3,
                         ),
                       )
-                    : snapshot.connectionState == ConnectionState.waiting
-                        ? const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.blue,
-                              strokeWidth: 3,
-                            ),
-                          )
-                        : ListView.builder(
-                            itemCount: whoLogged.length,
-                            itemBuilder: (context, index) {
-                              Provider.of<DataProvider>(context).binders(
-                                  totalSumOfShop.toString(),
-                                  totalSumOfShopGiven.toString());
-                              return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: AnimatedContainer(
-                                  padding: const EdgeInsets.only(
-                                      left: 8.0, right: 8),
-                                  margin: const EdgeInsets.only(
-                                      left: 8.0, right: 8, top: 10),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        const Color.fromRGBO(40, 53, 147, 1),
-                                        const Color.fromRGBO(40, 53, 147, 1)
-                                            .withOpacity(0.9)
-                                      ],
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.5),
-                                        blurRadius: 4,
-                                        offset: const Offset(
-                                            4, 8), // changes position of shadow
+                    : ListView.builder(
+                        itemCount: 1,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: AnimatedContainer(
+                              padding:
+                                  const EdgeInsets.only(left: 8.0, right: 8),
+                              margin: const EdgeInsets.only(
+                                  left: 8.0, right: 8, top: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    const Color.fromRGBO(40, 53, 147, 1),
+                                    const Color.fromRGBO(40, 53, 147, 1)
+                                        .withOpacity(0.9)
+                                  ],
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    blurRadius: 4,
+                                    offset: const Offset(
+                                        4, 8), // changes position of shadow
+                                  ),
+                                ],
+                              ),
+                              duration: const Duration(seconds: 1),
+                              curve: Curves.fastLinearToSlowEaseIn,
+                              height: 350,
+                              width: 350,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        DateFormat.E().format(
+                                          DateTime.parse(
+                                              DateTime.now().toString()),
+                                        ),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 25,
+                                        ),
                                       ),
+                                      const SizedBox(
+                                        width: 20,
+                                      ),
+                                      Text('Tot Daily Income: $totalSold',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 20,
+                                          )),
                                     ],
                                   ),
-                                  duration: const Duration(seconds: 1),
-                                  curve: Curves.fastLinearToSlowEaseIn,
-                                  height: 350,
-                                  width: 350,
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            DateFormat.E().format(
-                                              DateTime.parse(dataEntered
-                                                  .last['producedDate']),
-                                            ),
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w900,
-                                              fontSize: 25,
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            width: 20,
-                                          ),
-                                          Text(
-                                              'Tot Daily Income: $totalSumOfShop',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w900,
-                                                fontSize: 20,
-                                              )),
-                                        ],
-                                      ),
-                                      Expanded(
-                                        flex: 4,
-                                        child: AnimationLimiter(
-                                          child: GridView.count(
-                                            physics: const BouncingScrollPhysics(
-                                                parent:
-                                                    AlwaysScrollableScrollPhysics()),
-                                            padding: EdgeInsets.all(_w / 20),
-                                            crossAxisCount: columnCount,
-                                            children: listOfPrice
-                                                .map(
-                                                  (e) => AnimationConfiguration
-                                                      .staggeredGrid(
-                                                    position: index,
+                                  Expanded(
+                                    flex: 4,
+                                    child: AnimationLimiter(
+                                      child: GridView.count(
+                                        physics: const BouncingScrollPhysics(
+                                            parent:
+                                                AlwaysScrollableScrollPhysics()),
+                                        padding: EdgeInsets.all(_w / 20),
+                                        crossAxisCount: columnCount,
+                                        children: listOfPrice
+                                            .map((e) => AnimationConfiguration
+                                                    .staggeredGrid(
+                                                  position: index,
+                                                  duration: const Duration(
+                                                      milliseconds: 500),
+                                                  columnCount: columnCount,
+                                                  child: ScaleAnimation(
                                                     duration: const Duration(
-                                                        milliseconds: 500),
-                                                    columnCount: columnCount,
-                                                    child: ScaleAnimation(
-                                                      duration: const Duration(
-                                                          milliseconds: 900),
-                                                      curve: Curves
-                                                          .fastLinearToSlowEaseIn,
-                                                      child: FadeInAnimation(
-                                                        child: Container(
-                                                          margin:
-                                                              EdgeInsets.only(
-                                                                  bottom:
-                                                                      _w / 30,
-                                                                  left: _w / 60,
-                                                                  right:
-                                                                      _w / 60),
-                                                          decoration:
-                                                              const BoxDecoration(
-                                                            color: Colors.white,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            20)),
-                                                          ),
-                                                          child: Column(
-                                                            children: [
-                                                              Image.asset(
-                                                                e['image'],
-                                                                width: 50,
+                                                        milliseconds: 900),
+                                                    curve: Curves
+                                                        .fastLinearToSlowEaseIn,
+                                                    child: FadeInAnimation(
+                                                      child: Container(
+                                                        margin: EdgeInsets.only(
+                                                            bottom: _w / 30,
+                                                            left: _w / 60,
+                                                            right: _w / 60),
+                                                        decoration:
+                                                            const BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          20)),
+                                                        ),
+                                                        child: Column(
+                                                          children: [
+                                                            Image.asset(
+                                                              e['image'],
+                                                              width: 50,
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(8.0),
+                                                              child: Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  const Text(
+                                                                    'Given',
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.w900),
+                                                                  ),
+                                                                  Text(e[
+                                                                      'given']),
+                                                                ],
                                                               ),
-                                                              Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .all(
-                                                                        8.0),
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
-                                                                  children: [
-                                                                    const Text(
-                                                                      'Given',
-                                                                      style: TextStyle(
-                                                                          fontWeight:
-                                                                              FontWeight.w900),
-                                                                    ),
-                                                                    Text(e[
-                                                                        'given']),
-                                                                  ],
-                                                                ),
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(8.0),
+                                                              child: Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  const Text(
+                                                                    'Sold',
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.w900),
+                                                                  ),
+                                                                  Text(e[
+                                                                      'sold']),
+                                                                ],
                                                               ),
-                                                              Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .all(
-                                                                        8.0),
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
-                                                                  children: [
-                                                                    const Text(
-                                                                      'Sold',
-                                                                      style: TextStyle(
-                                                                          fontWeight:
-                                                                              FontWeight.w900),
-                                                                    ),
-                                                                    Text(e[
-                                                                        'sold']),
-                                                                  ],
-                                                                ),
-                                                              )
-                                                            ],
-                                                          ),
+                                                            )
+                                                          ],
                                                         ),
                                                       ),
                                                     ),
                                                   ),
-                                                )
-                                                .toList(),
-                                          ),
-                                        ),
+                                                ))
+                                            .toList(),
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
+                                ],
+                              ),
+                            ),
                           );
+                        },
+                      );
               },
             ),
           ),
@@ -519,7 +669,7 @@ class _DailySellState extends State<DailySell> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (ctx) =>
-                      ProductionInput(shopEmployeeEmail: dailyGiven),
+                      ProductionInput(shopEmployeeEmail: loggedEmail),
                 ),
               );
             },
