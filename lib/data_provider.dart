@@ -3,37 +3,21 @@ import 'package:flutter/material.dart';
 
 class DataProvider extends ChangeNotifier {
   String loggedUserEmail = '';
-  final List<Map<String, dynamic>> databaseDataForProduction = [];
-  final List<Map<String, dynamic>> databaseDataForShop = [];
+  String totalSoldIncome = '';
+  String totalExpectedIncome = '';
+
+  final List<Map<String, dynamic>> dailyShopData = [];
 
   checker(String userEmail) {
     loggedUserEmail = userEmail;
+
     notifyListeners();
   }
 
-  void loadProductionList() async {
-    notifyListeners();
-    await for (var x
-        in FirebaseFirestore.instance.collection('DailySell').snapshots()) {
-      for (var snap in x.docs) {
-        notifyListeners();
-        databaseDataForProduction.add(snap.data());
-      }
-    }
-    notifyListeners();
-  }
-
-  void loadShopGivenList() async {
-    notifyListeners();
-    await for (var x in FirebaseFirestore.instance
-        .collection('DailyShopGiven')
-        .snapshots()) {
-      for (var snap in x.docs) {
-        notifyListeners();
-        databaseDataForProduction.add(snap.data());
-      }
-    }
-    notifyListeners();
+  binders(String totalSold, String expectedIncome) {
+    totalSoldIncome = totalSold;
+    totalExpectedIncome = expectedIncome;
+    //notifyListeners();
   }
 
   void loadSoldList() async {
@@ -41,8 +25,8 @@ class DataProvider extends ChangeNotifier {
     await for (var y
         in FirebaseFirestore.instance.collection('DailyShopSell').snapshots()) {
       for (var snapSell in y.docs) {
-        notifyListeners();
-        databaseDataForShop.add(snapSell.data());
+        // notifyListeners();
+        dailyShopData.add(snapSell.data());
       }
     }
     notifyListeners();

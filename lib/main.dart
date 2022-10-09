@@ -17,7 +17,7 @@ void main() async {
         ChangeNotifierProvider(
           create: (ctx) => DataProvider()
             ..loadSoldList()
-            ..loadProductionList(),
+            ,
         ),
         ChangeNotifierProvider(
           create: (BuildContext context) => DataStorage(),

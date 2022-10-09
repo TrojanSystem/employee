@@ -11,6 +11,9 @@ import 'package:provider/provider.dart';
 import '../other/constants.dart';
 import '../other/drop_down_menu_button.dart';
 
+List result = [];
+List whoLogged = [];
+
 class DailySell extends StatefulWidget {
   const DailySell({Key key}) : super(key: key);
 
@@ -21,6 +24,8 @@ class DailySell extends StatefulWidget {
 class _DailySellState extends State<DailySell> {
   List productionData = [];
   List dailySold = [];
+
+  var data;
   int updateIndex = 0;
   bool isTapped = true;
   double totalSumation = 0.00;
@@ -29,28 +34,20 @@ class _DailySellState extends State<DailySell> {
   int selectedDayOfMonth = DateTime.now().day;
   int totIncome = 0;
   int totExpectedIncome = 0;
-  List result = [];
-  List whoLogged = [];
+
   @override
   void initState() {
-    dailySold;
+    data;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<String> imageOfBread = [
-      'images/bale_5.png',
-      'images/bale_10.png',
-      'images/slice.png',
-      'images/donut.png'
-    ];
     double _w = MediaQuery.of(context).size.width;
     int columnCount = 2;
     final dailyGiven = Provider.of<DataProvider>(context).loggedUserEmail;
-
+    data = Provider.of<DataProvider>(context);
     final dailyExpense = Provider.of<DataStorage>(context).daysOfMonth;
-    dailySold = Provider.of<DataProvider>(context).databaseDataForProduction;
 
     return Scaffold(
       appBar: AppBar(
@@ -103,14 +100,14 @@ class _DailySellState extends State<DailySell> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Expected Income: $totExpectedIncome',
+                            'Expected Income: ${data.totalExpectedIncome}',
                             style: dailyIncomeStyle,
                           ),
                           const SizedBox(
                             height: 10,
                           ),
                           Text(
-                            'Tot Sold: $totIncome',
+                            'Tot Sold: ${data.totalSoldIncome}',
                             style: dailyIncomeStyle,
                           ),
                         ],
@@ -126,7 +123,7 @@ class _DailySellState extends State<DailySell> {
             flex: 6,
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('DailyShopSell')
+                  .collection('DailyShopGiven')
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -139,46 +136,193 @@ class _DailySellState extends State<DailySell> {
                 }
                 productionData = snapshot.data.docs;
                 whoLogged = productionData
-                    .where((element) => element['employeeEmail'] == dailyGiven)
+                    .where((element) => element['seller'] == dailyGiven)
                     .toList();
 
                 result = whoLogged
                     .where((element) =>
-                        DateTime.parse(element['date']).year ==
+                        DateTime.parse(element['producedDate']).year ==
                         DateTime.now().year)
                     .toList();
 
-                var todayMonthFilteredList = result
+                var daboMonthlyDelivered = result
+                    .where((element) =>
+                        DateTime.parse(element['producedDate']).month ==
+                        DateTime.now().month)
+                    .toList();
+                var dataEntered = daboMonthlyDelivered
+                    .where((element) =>
+                        DateTime.parse(element['producedDate']).day ==
+                        selectedDayOfMonth)
+                    .toList();
+
+                var totalDailyGivenItemsBale_5 =
+                    dataEntered.map((e) => e['bale_5']).toList();
+
+                var totDailyGivenSumBale_5 = 0;
+                for (int xx = 0; xx < totalDailyGivenItemsBale_5.length; xx++) {
+                  totDailyGivenSumBale_5 +=
+                      int.parse(totalDailyGivenItemsBale_5[xx]);
+                }
+                var totalDailyGivenItemsBale_10 =
+                    dataEntered.map((e) => e['bale_10']).toList();
+
+                var totDailyGivenSumBale_10 = 0;
+                for (int xx = 0;
+                    xx < totalDailyGivenItemsBale_10.length;
+                    xx++) {
+                  totDailyGivenSumBale_10 +=
+                      int.parse(totalDailyGivenItemsBale_10[xx]);
+                }
+                var totalDailyGivenItemsSlice =
+                    dataEntered.map((e) => e['slice']).toList();
+
+                var totDailyGivenSumSlice = 0;
+                for (int xx = 0; xx < totalDailyGivenItemsSlice.length; xx++) {
+                  totDailyGivenSumSlice +=
+                      int.parse(totalDailyGivenItemsSlice[xx]);
+                }
+                var totalDailyGivenItemsBombolino =
+                    dataEntered.map((e) => e['bombolino']).toList();
+
+                var totDailyGivenSumBombolino = 0;
+                for (int xx = 0;
+                    xx < totalDailyGivenItemsBombolino.length;
+                    xx++) {
+                  totDailyGivenSumBombolino +=
+                      int.parse(totalDailyGivenItemsBombolino[xx]);
+                }
+                final double totalGivenBale_5 = totDailyGivenSumBale_5 *
+                    (dataEntered.isEmpty
+                        ? 0.0
+                        : double.parse(dataEntered.last['bale_5_Sp']));
+                final double totalGivenBale_10 = totDailyGivenSumBale_10 *
+                    (dataEntered.isEmpty
+                        ? 0.0
+                        : double.parse(dataEntered.last['bale_10_Sp']));
+                final double totalGivenSlice = totDailyGivenSumSlice *
+                    (dataEntered.isEmpty
+                        ? 0.0
+                        : double.parse(dataEntered.last['slice_Sp']));
+                final double totalGivenBombolino = totDailyGivenSumBombolino *
+                    (dataEntered.isEmpty
+                        ? 0.0
+                        : double.parse(dataEntered.last['bombolino_Sp']));
+                double totalSumOfShopGiven = totalGivenBale_5 +
+                    totalGivenBale_10 +
+                    totalGivenSlice +
+                    totalGivenBombolino;
+
+/*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+* */
+
+                final shopDailySold =
+                    Provider.of<DataProvider>(context).dailyShopData;
+                var currentLoggedIn = shopDailySold
+                    .where((element) => element['employeeEmail'] == dailyGiven)
+                    .toList();
+
+                final resultShopSold = currentLoggedIn
+                    .where((element) =>
+                        DateTime.parse(element['date']).year ==
+                        DateTime.now().year)
+                    .toList()
+                    .toSet();
+
+                var currentLoggedInFilteredList = resultShopSold
                     .where((element) =>
                         DateTime.parse(element['date']).month ==
                         DateTime.now().month)
                     .toList();
-                var dataEntered = todayMonthFilteredList
+                var dailySoldItems = currentLoggedInFilteredList
                     .where((element) =>
                         DateTime.parse(element['date']).day ==
                         selectedDayOfMonth)
                     .toList();
 
-                totIncome = dataEntered.isEmpty
-                    ? 0
-                    : ((int.parse(dataEntered.last['bale_5']) *
-                            int.parse(dataEntered.last['bale_5_Sp'])) +
-                        (int.parse(dataEntered.last['bale_10']) *
-                            int.parse(dataEntered.last['bale_10_Sp'])) +
-                        (int.parse(dataEntered.last['slice']) *
-                            int.parse(dataEntered.last['slice_Sp'])) +
-                        (int.parse(dataEntered.last['bombolino']) *
-                            int.parse(dataEntered.last['bombolino_Sp'])));
-                totExpectedIncome = dailySold.isEmpty
-                    ? 0
-                    : ((int.parse(dailySold.last['bale_5']) *
-                            int.parse(dailySold.last['bale_5_Sp'])) +
-                        (int.parse(dailySold.last['bale_10']) *
-                            int.parse(dailySold.last['bale_10_Sp'])) +
-                        (int.parse(dailySold.last['slice']) *
-                            int.parse(dailySold.last['slice_Sp'])) +
-                        (int.parse(dailySold.last['bombolino']) *
-                            int.parse(dailySold.last['bombolino_Sp'])));
+                var totalDailySoldItemsBale_5 =
+                    dailySoldItems.map((e) => e['bale_5']).toList();
+                print('this ${totalDailySoldItemsBale_5}');
+                var totDailySoldSumBale_5 = 0;
+                for (int xx = 0; xx < totalDailySoldItemsBale_5.length; xx++) {
+                  totDailySoldSumBale_5 +=
+                      int.parse(totalDailySoldItemsBale_5[xx]);
+                }
+                var totalDailySoldItemsBale_10 =
+                    dailySoldItems.map((e) => e['bale_10']).toList();
+
+                var totDailySoldSumBale_10 = 0;
+                for (int xx = 0; xx < totalDailySoldItemsBale_10.length; xx++) {
+                  totDailySoldSumBale_10 +=
+                      int.parse(totalDailySoldItemsBale_10[xx]);
+                }
+                var totalDailySoldItemsSlice =
+                    dailySoldItems.map((e) => e['slice']).toList();
+
+                var totDailySoldSumSlice = 0;
+                for (int xx = 0; xx < totalDailySoldItemsSlice.length; xx++) {
+                  totDailySoldSumSlice +=
+                      int.parse(totalDailySoldItemsSlice[xx]);
+                }
+                var totalDailySoldItemsBombolino =
+                    dailySoldItems.map((e) => e['bombolino']).toList();
+
+                var totDailySoldSumBombolino = 0;
+                for (int xx = 0;
+                    xx < totalDailySoldItemsBombolino.length;
+                    xx++) {
+                  totDailySoldSumBombolino +=
+                      int.parse(totalDailySoldItemsBombolino[xx]);
+                }
+                final double totalBale_5 = totDailySoldSumBale_5 *
+                    (dailySoldItems.isEmpty
+                        ? 0.0
+                        : double.parse(dailySoldItems.last['bale_5_Sp']));
+                final double totalBale_10 = totDailySoldSumBale_10 *
+                    (dailySoldItems.isEmpty
+                        ? 0.0
+                        : double.parse(dailySoldItems.last['bale_10_Sp']));
+                final double totalSlice = totDailySoldSumSlice *
+                    (dailySoldItems.isEmpty
+                        ? 0.0
+                        : double.parse(dailySoldItems.last['slice_Sp']));
+                final double totalBombolino = totDailySoldSumBombolino *
+                    (dailySoldItems.isEmpty
+                        ? 0.0
+                        : double.parse(dailySoldItems.last['bombolino_Sp']));
+                double totalSumOfShop =
+                    totalBale_5 + totalBale_10 + totalSlice + totalBombolino;
+                final listOfPrice = [
+                  {
+                    'image': 'images/bale_5.png',
+                    'sold': '$totDailySoldSumBale_5',
+                    'given': '$totDailyGivenSumBale_5',
+                  },
+                  {
+                    'image': 'images/bale_10.png',
+                    'sold': '$totDailySoldSumBale_10',
+                    'given': '$totDailyGivenSumBale_10',
+                  },
+                  {
+                    'image': 'images/slice.png',
+                    'sold': '$totDailySoldSumSlice',
+                    'given': '$totDailyGivenSumSlice',
+                  },
+                  {
+                    'image': 'images/donut.png',
+                    'sold': '$totDailySoldSumBombolino',
+                    'given': '$totDailyGivenSumBombolino',
+                  }
+                ];
 
                 return dataEntered.isEmpty
                     ? Center(
@@ -195,8 +339,11 @@ class _DailySellState extends State<DailySell> {
                             ),
                           )
                         : ListView.builder(
-                            itemCount: dataEntered.length,
+                            itemCount: whoLogged.length,
                             itemBuilder: (context, index) {
+                              Provider.of<DataProvider>(context).binders(
+                                  totalSumOfShop.toString(),
+                                  totalSumOfShopGiven.toString());
                               return Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: AnimatedContainer(
@@ -234,8 +381,8 @@ class _DailySellState extends State<DailySell> {
                                         children: [
                                           Text(
                                             DateFormat.E().format(
-                                              DateTime.parse(
-                                                  dailySold.last['date']),
+                                              DateTime.parse(dataEntered
+                                                  .last['producedDate']),
                                             ),
                                             style: const TextStyle(
                                               color: Colors.white,
@@ -246,7 +393,8 @@ class _DailySellState extends State<DailySell> {
                                           const SizedBox(
                                             width: 20,
                                           ),
-                                          Text('Tot Daily Income: $totIncome',
+                                          Text(
+                                              'Tot Daily Income: $totalSumOfShop',
                                               style: const TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.w900,
@@ -257,447 +405,99 @@ class _DailySellState extends State<DailySell> {
                                       Expanded(
                                         flex: 4,
                                         child: AnimationLimiter(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              Expanded(
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child:
-                                                          AnimationConfiguration
-                                                              .staggeredGrid(
-                                                        position: 0,
-                                                        duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    500),
-                                                        columnCount:
-                                                            columnCount,
-                                                        child: ScaleAnimation(
-                                                          duration:
-                                                              const Duration(
-                                                                  milliseconds:
-                                                                      900),
-                                                          curve: Curves
-                                                              .fastLinearToSlowEaseIn,
-                                                          child:
-                                                              FadeInAnimation(
-                                                            child: Container(
-                                                              margin: EdgeInsets
-                                                                  .only(
-                                                                      bottom:
-                                                                          _w /
-                                                                              30,
-                                                                      left: _w /
-                                                                          60,
-                                                                      right: _w /
-                                                                          60),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Colors
-                                                                    .white,
-                                                                borderRadius:
-                                                                    const BorderRadius
-                                                                            .all(
-                                                                        Radius.circular(
+                                          child: GridView.count(
+                                            physics: const BouncingScrollPhysics(
+                                                parent:
+                                                    AlwaysScrollableScrollPhysics()),
+                                            padding: EdgeInsets.all(_w / 20),
+                                            crossAxisCount: columnCount,
+                                            children: listOfPrice
+                                                .map(
+                                                  (e) => AnimationConfiguration
+                                                      .staggeredGrid(
+                                                    position: index,
+                                                    duration: const Duration(
+                                                        milliseconds: 500),
+                                                    columnCount: columnCount,
+                                                    child: ScaleAnimation(
+                                                      duration: const Duration(
+                                                          milliseconds: 900),
+                                                      curve: Curves
+                                                          .fastLinearToSlowEaseIn,
+                                                      child: FadeInAnimation(
+                                                        child: Container(
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  bottom:
+                                                                      _w / 30,
+                                                                  left: _w / 60,
+                                                                  right:
+                                                                      _w / 60),
+                                                          decoration:
+                                                              const BoxDecoration(
+                                                            color: Colors.white,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
                                                                             20)),
-                                                                boxShadow: [
-                                                                  BoxShadow(
-                                                                    color: Colors
-                                                                        .black
-                                                                        .withOpacity(
-                                                                            0.1),
-                                                                    blurRadius:
-                                                                        40,
-                                                                    spreadRadius:
-                                                                        10,
-                                                                  ),
-                                                                ],
+                                                          ),
+                                                          child: Column(
+                                                            children: [
+                                                              Image.asset(
+                                                                e['image'],
+                                                                width: 50,
                                                               ),
-                                                              child: Column(
-                                                                children: [
-                                                                  Image.asset(
-                                                                    imageOfBread[
-                                                                        0],
-                                                                    width: 50,
-                                                                  ),
-                                                                  Padding(
-                                                                    padding:
-                                                                        const EdgeInsets.all(
-                                                                            8.0),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
-                                                                      children: [
-                                                                        const Text(
-                                                                          'Given',
-                                                                          style:
-                                                                              TextStyle(fontWeight: FontWeight.w900),
-                                                                        ),
-                                                                        Text(dailySold.length <
-                                                                                dataEntered.length
-                                                                            ? dailySold.last['bale_5'].toString()
-                                                                            : dailySold[index]['bale_5'].toString()),
-                                                                      ],
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .all(
+                                                                        8.0),
+                                                                child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    const Text(
+                                                                      'Given',
+                                                                      style: TextStyle(
+                                                                          fontWeight:
+                                                                              FontWeight.w900),
                                                                     ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding:
-                                                                        const EdgeInsets.all(
-                                                                            8.0),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
-                                                                      children: [
-                                                                        const Text(
-                                                                          'Sold',
-                                                                          style:
-                                                                              TextStyle(fontWeight: FontWeight.w900),
-                                                                        ),
-                                                                        Text(dataEntered[index]['bale_5']
-                                                                            .toString()),
-                                                                      ],
-                                                                    ),
-                                                                  )
-                                                                ],
+                                                                    Text(e[
+                                                                        'given']),
+                                                                  ],
+                                                                ),
                                                               ),
-                                                            ),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .all(
+                                                                        8.0),
+                                                                child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    const Text(
+                                                                      'Sold',
+                                                                      style: TextStyle(
+                                                                          fontWeight:
+                                                                              FontWeight.w900),
+                                                                    ),
+                                                                    Text(e[
+                                                                        'sold']),
+                                                                  ],
+                                                                ),
+                                                              )
+                                                            ],
                                                           ),
                                                         ),
                                                       ),
                                                     ),
-                                                    Expanded(
-                                                      child:
-                                                          AnimationConfiguration
-                                                              .staggeredGrid(
-                                                        position: 1,
-                                                        duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    500),
-                                                        columnCount:
-                                                            columnCount,
-                                                        child: ScaleAnimation(
-                                                          duration:
-                                                              const Duration(
-                                                                  milliseconds:
-                                                                      900),
-                                                          curve: Curves
-                                                              .fastLinearToSlowEaseIn,
-                                                          child:
-                                                              FadeInAnimation(
-                                                            child: Container(
-                                                              margin: EdgeInsets
-                                                                  .only(
-                                                                      bottom:
-                                                                          _w /
-                                                                              30,
-                                                                      left: _w /
-                                                                          60,
-                                                                      right: _w /
-                                                                          60),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Colors
-                                                                    .white,
-                                                                borderRadius:
-                                                                    const BorderRadius
-                                                                            .all(
-                                                                        Radius.circular(
-                                                                            20)),
-                                                                boxShadow: [
-                                                                  BoxShadow(
-                                                                    color: Colors
-                                                                        .black
-                                                                        .withOpacity(
-                                                                            0.1),
-                                                                    blurRadius:
-                                                                        40,
-                                                                    spreadRadius:
-                                                                        10,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              child: Column(
-                                                                children: [
-                                                                  Image.asset(
-                                                                    imageOfBread[
-                                                                        1],
-                                                                    width: 50,
-                                                                  ),
-                                                                  Padding(
-                                                                    padding:
-                                                                        const EdgeInsets.all(
-                                                                            8.0),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
-                                                                      children: [
-                                                                        const Text(
-                                                                          'Given',
-                                                                          style:
-                                                                              TextStyle(fontWeight: FontWeight.w900),
-                                                                        ),
-                                                                        Text(dailySold.length <
-                                                                                dataEntered.length
-                                                                            ? dailySold.last['bale_10'].toString()
-                                                                            : dailySold[index]['bale_10'].toString()),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding:
-                                                                        const EdgeInsets.all(
-                                                                            8.0),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
-                                                                      children: [
-                                                                        const Text(
-                                                                          'Sold',
-                                                                          style:
-                                                                              TextStyle(fontWeight: FontWeight.w900),
-                                                                        ),
-                                                                        Text(dataEntered[index]['bale_10']
-                                                                            .toString()),
-                                                                      ],
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child:
-                                                          AnimationConfiguration
-                                                              .staggeredGrid(
-                                                        position: 0,
-                                                        duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    500),
-                                                        columnCount:
-                                                            columnCount,
-                                                        child: ScaleAnimation(
-                                                          duration:
-                                                              const Duration(
-                                                                  milliseconds:
-                                                                      900),
-                                                          curve: Curves
-                                                              .fastLinearToSlowEaseIn,
-                                                          child:
-                                                              FadeInAnimation(
-                                                            child: Container(
-                                                              margin: EdgeInsets
-                                                                  .only(
-                                                                      bottom:
-                                                                          _w /
-                                                                              30,
-                                                                      left: _w /
-                                                                          60,
-                                                                      right: _w /
-                                                                          60),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Colors
-                                                                    .white,
-                                                                borderRadius:
-                                                                    const BorderRadius
-                                                                            .all(
-                                                                        Radius.circular(
-                                                                            20)),
-                                                                boxShadow: [
-                                                                  BoxShadow(
-                                                                    color: Colors
-                                                                        .black
-                                                                        .withOpacity(
-                                                                            0.1),
-                                                                    blurRadius:
-                                                                        40,
-                                                                    spreadRadius:
-                                                                        10,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              child: Column(
-                                                                children: [
-                                                                  Image.asset(
-                                                                    imageOfBread[
-                                                                        2],
-                                                                    width: 50,
-                                                                  ),
-                                                                  Padding(
-                                                                    padding:
-                                                                        const EdgeInsets.all(
-                                                                            8.0),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
-                                                                      children: [
-                                                                        const Text(
-                                                                          'Given',
-                                                                          style:
-                                                                              TextStyle(fontWeight: FontWeight.w900),
-                                                                        ),
-                                                                        Text(dailySold.length <
-                                                                                dataEntered.length
-                                                                            ? dailySold.last['slice'].toString()
-                                                                            : dailySold[index]['slice'].toString()),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding:
-                                                                        const EdgeInsets.all(
-                                                                            8.0),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
-                                                                      children: [
-                                                                        const Text(
-                                                                          'Sold',
-                                                                          style:
-                                                                              TextStyle(fontWeight: FontWeight.w900),
-                                                                        ),
-                                                                        Text(dataEntered[index]['slice']
-                                                                            .toString()),
-                                                                      ],
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      child:
-                                                          AnimationConfiguration
-                                                              .staggeredGrid(
-                                                        position: 0,
-                                                        duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    500),
-                                                        columnCount:
-                                                            columnCount,
-                                                        child: ScaleAnimation(
-                                                          duration:
-                                                              const Duration(
-                                                                  milliseconds:
-                                                                      900),
-                                                          curve: Curves
-                                                              .fastLinearToSlowEaseIn,
-                                                          child:
-                                                              FadeInAnimation(
-                                                            child: Container(
-                                                              margin: EdgeInsets
-                                                                  .only(
-                                                                      bottom:
-                                                                          _w /
-                                                                              30,
-                                                                      left: _w /
-                                                                          60,
-                                                                      right: _w /
-                                                                          60),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Colors
-                                                                    .white,
-                                                                borderRadius:
-                                                                    const BorderRadius
-                                                                            .all(
-                                                                        Radius.circular(
-                                                                            20)),
-                                                                boxShadow: [
-                                                                  BoxShadow(
-                                                                    color: Colors
-                                                                        .black
-                                                                        .withOpacity(
-                                                                            0.1),
-                                                                    blurRadius:
-                                                                        40,
-                                                                    spreadRadius:
-                                                                        10,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              child: Column(
-                                                                children: [
-                                                                  Image.asset(
-                                                                    imageOfBread[
-                                                                        3],
-                                                                    width: 50,
-                                                                  ),
-                                                                  Padding(
-                                                                    padding:
-                                                                        const EdgeInsets.all(
-                                                                            8.0),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
-                                                                      children: [
-                                                                        const Text(
-                                                                          'Given',
-                                                                          style:
-                                                                              TextStyle(fontWeight: FontWeight.w900),
-                                                                        ),
-                                                                        Text(dailySold.length <
-                                                                                dataEntered.length
-                                                                            ? dailySold.last['bombolino'].toString()
-                                                                            : dailySold[index]['bombolino'].toString()),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding:
-                                                                        const EdgeInsets.all(
-                                                                            8.0),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
-                                                                      children: [
-                                                                        const Text(
-                                                                          'Sold',
-                                                                          style:
-                                                                              TextStyle(fontWeight: FontWeight.w900),
-                                                                        ),
-                                                                        Text(dataEntered[index]['bombolino']
-                                                                            .toString()),
-                                                                      ],
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
+                                                  ),
+                                                )
+                                                .toList(),
                                           ),
                                         ),
                                       ),

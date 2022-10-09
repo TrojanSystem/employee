@@ -4,7 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:provider/provider.dart';
 
+import '../data_provider.dart';
 import '../home_page.dart';
 import '../other/constants.dart';
 
@@ -277,6 +279,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             builder: (ctx) => HomePage(),
                           ),
                         );
+                        setState(() {
+                          Provider.of<DataProvider>(context, listen: false)
+                              .checker(auth.currentUser.email);
+                        });
                       }
                     } catch (e) {
                       showDialog(

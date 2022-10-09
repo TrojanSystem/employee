@@ -484,24 +484,22 @@ class _ProductionInputState extends State<ProductionInput> {
             //button
             GestureDetector(
               onTap: () {
-                setState(() {
-                  if (formKey.currentState.validate()) {
-                    formKey.currentState.save();
-                    FirebaseFirestore.instance.collection('DailyShopSell').add({
-                      'employeeEmail': widget.shopEmployeeEmail,
-                      'date': dateTime,
-                      'bale_5': bale_5,
-                      'bale_5_Sp': bale_5_SP,
-                      'bale_10': bale_10,
-                      'bale_10_Sp': bale_10_SP,
-                      'slice': slice,
-                      'slice_Sp': slice_SP,
-                      'bombolino': bombolino,
-                      'bombolino_Sp': bombolino_SP
-                    });
-                    Navigator.of(context).pop();
-                  }
-                });
+                if (formKey.currentState.validate()) {
+                  formKey.currentState.save();
+                  FirebaseFirestore.instance.collection('DailyShopSell').add({
+                    'employeeEmail': widget.shopEmployeeEmail,
+                    'date': dateTime,
+                    'bale_5': bale_5,
+                    'bale_5_Sp': bale_5_SP,
+                    'bale_10': bale_10,
+                    'bale_10_Sp': bale_10_SP,
+                    'slice': slice,
+                    'slice_Sp': slice_SP,
+                    'bombolino': bombolino,
+                    'bombolino_Sp': bombolino_SP
+                  });
+                  Navigator.of(context).pop();
+                }
               },
               child: Container(
                 margin: const EdgeInsets.fromLTRB(100, 20, 100, 0),
