@@ -1,3 +1,4 @@
+import 'package:ada_bread/drawer/custom_drawer.dart';
 import 'package:ada_bread/expense_screen/expense_screen.dart';
 import 'package:ada_bread/home_screen/daily_sell.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       body: screens[currentIndex],
       bottomNavigationBar: MyCustomBottomNavigationBar(),
+
     );
   }
 }

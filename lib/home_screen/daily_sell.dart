@@ -8,6 +8,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../drawer/custom_drawer.dart';
 import '../other/constants.dart';
 import '../other/drop_down_menu_button.dart';
 
@@ -683,7 +684,7 @@ class _DailySellState extends State<DailySell> {
             },
             button_4: () {}),
       ),
-      drawer: const Drawer(),
+      drawer: const CustomDrawer(),
     );
   }
 }
