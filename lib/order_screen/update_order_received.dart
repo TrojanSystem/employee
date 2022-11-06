@@ -5,23 +5,23 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
 class UpdateOrderReceived extends StatefulWidget {
-  var id = '';
+  String id = '';
   String existedName = '';
   String existedPhoneNumber = '';
   String existedOrderedKilo = '';
   String existedPricePerKG = '';
   String existedTotalAmount = '';
-  String existedRemain = '';
+  String existedPayed = '';
   String existedDateTime = '';
   UpdateOrderReceived(
-      {this.existedDateTime,
-      this.id,
-      this.existedName,
-      this.existedOrderedKilo,
-      this.existedPhoneNumber,
-      this.existedPricePerKG,
-      this.existedRemain,
-      this.existedTotalAmount});
+      {@required this.existedDateTime,
+      @required this.id,
+      @required this.existedName,
+      @required this.existedOrderedKilo,
+      @required this.existedPhoneNumber,
+      @required this.existedPricePerKG,
+      @required this.existedPayed,
+      @required this.existedTotalAmount});
   @override
   State<UpdateOrderReceived> createState() => _UpdateOrderReceivedState();
 }
@@ -32,12 +32,20 @@ class _UpdateOrderReceivedState extends State<UpdateOrderReceived> {
   List<String> people = ['0923675686', '0917920560'];
   bool sendDirect = false;
   final formKey = GlobalKey<FormState>();
+  final TextEditingController _name = TextEditingController();
+  final TextEditingController _phoneNumber = TextEditingController();
+  final TextEditingController _orderedKilo = TextEditingController();
+  final TextEditingController _pricePerKG = TextEditingController();
+  final TextEditingController _totalAmount = TextEditingController();
+  final TextEditingController _remain = TextEditingController();
   String name = '';
   String phoneNumber = '';
   String orderedKilo = '';
   String pricePerKG = '';
   String totalAmount = '';
-  String remain = '';
+  String payed = '';
+  int totBzet = 0;
+  int totPricePerKg = 0;
   String dateTime = DateTime.now().toString();
   void datePicker() {
     showDatePicker(
@@ -72,6 +80,17 @@ class _UpdateOrderReceivedState extends State<UpdateOrderReceived> {
     setState(() => _canSendSMSMessage =
         _result ? 'This unit can send SMS' : 'This unit cannot send SMS');
     return _result;
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _orderedKilo.dispose();
+    _pricePerKG.dispose();
+    _totalAmount.dispose();
+    _remain.dispose();
+    _phoneNumber.dispose();
+    super.dispose();
   }
 
   @override
@@ -255,6 +274,11 @@ class _UpdateOrderReceivedState extends State<UpdateOrderReceived> {
                               return null;
                             }
                           },
+                          onChanged: (value) {
+                            setState(() {
+                              totBzet = int.parse(value);
+                            });
+                          },
                           onSaved: (value) {
                             orderedKilo = value;
                           },
@@ -302,6 +326,11 @@ class _UpdateOrderReceivedState extends State<UpdateOrderReceived> {
                               return null;
                             }
                           },
+                          onChanged: (value) {
+                            setState(() {
+                              totPricePerKg = int.parse(value);
+                            });
+                          },
                           onSaved: (value) {
                             pricePerKG = value;
                           },
@@ -329,8 +358,8 @@ class _UpdateOrderReceivedState extends State<UpdateOrderReceived> {
               children: [
                 Expanded(
                   flex: 1,
-                  child: Container(
-                    margin: const EdgeInsets.fromLTRB(25, 8, 25, 8),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(35, 8, 8, 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -344,29 +373,25 @@ class _UpdateOrderReceivedState extends State<UpdateOrderReceived> {
                         const SizedBox(
                           height: 10,
                         ),
-                        TextFormField(
-                          initialValue: widget.existedTotalAmount,
-                          validator: (value) {
-                            if (value.isEmpty) {
-                              return 'Can\'t be empty';
-                            } else {
-                              return null;
-                            }
-                          },
-                          onSaved: (value) {
-                            totalAmount = value;
-                          },
-                          decoration: InputDecoration(
-                            hintText: 'Total',
-                            filled: true,
-                            fillColor: Colors.grey[200],
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(10),
+                        Container(
+                          padding: const EdgeInsets.only(top: 20, left: 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey[200],
+                          ),
+                          width: 120,
+                          height: 60,
+                          child: Text(
+                            totBzet == 0 && totPricePerKg == 0
+                                ? widget.existedTotalAmount
+                                : totBzet != 0 && totPricePerKg == 0
+                                    ? '${totBzet * int.parse(widget.existedPricePerKG)}'
+                                    : totBzet == 0 && totPricePerKg != 0
+                                        ? '${int.parse(widget.existedOrderedKilo) * totPricePerKg}'
+                                        : '${totBzet * totPricePerKg}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 18,
                             ),
                           ),
                         ),
@@ -382,7 +407,7 @@ class _UpdateOrderReceivedState extends State<UpdateOrderReceived> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Remain',
+                          'Payed',
                           style: TextStyle(
                             fontWeight: FontWeight.w900,
                             fontSize: 18,
@@ -392,7 +417,7 @@ class _UpdateOrderReceivedState extends State<UpdateOrderReceived> {
                           height: 10,
                         ),
                         TextFormField(
-                          initialValue: widget.existedRemain,
+                          initialValue: widget.existedPayed,
                           validator: (value) {
                             if (value.isEmpty) {
                               return 'Can\'t be empty';
@@ -401,10 +426,10 @@ class _UpdateOrderReceivedState extends State<UpdateOrderReceived> {
                             }
                           },
                           onSaved: (value) {
-                            remain = value;
+                            payed = value;
                           },
                           decoration: InputDecoration(
-                            hintText: 'Remain',
+                            hintText: 'Payed',
                             filled: true,
                             fillColor: Colors.grey[200],
                             enabledBorder: OutlineInputBorder(
@@ -432,16 +457,29 @@ class _UpdateOrderReceivedState extends State<UpdateOrderReceived> {
                     await FirebaseFirestore.instance
                         .collection('OrderData')
                         .doc(widget.id)
-                        .update({
+                        .set({
+                      'orderType': 'employee',
                       'name': name,
-                      'remain': remain,
+                      'payed': payed,
                       'pricePerKG': pricePerKG,
-                      'totalAmount': totalAmount,
+                      'totalAmount': totBzet == 0 && totPricePerKg == 0
+                          ? widget.existedTotalAmount
+                          : totBzet != 0 && totPricePerKg == 0
+                              ? '${totBzet * int.parse(widget.existedPricePerKG)}'
+                              : totBzet == 0 && totPricePerKg != 0
+                                  ? '${int.parse(widget.existedOrderedKilo) * totPricePerKg}'
+                                  : '${totBzet * totPricePerKg}',
                       'orderedKilo': orderedKilo,
                       'phoneNumber': phoneNumber,
                       'date': dateTime,
                       'orderReceivedDate': DateTime.now().toString()
                     });
+                    _name.clear();
+                    _orderedKilo.clear();
+                    _pricePerKG.clear();
+                    _totalAmount.clear();
+                    _remain.clear();
+                    _phoneNumber.clear();
                     Fluttertoast.showToast(
                         msg: "Updated",
                         toastLength: Toast.LENGTH_SHORT,

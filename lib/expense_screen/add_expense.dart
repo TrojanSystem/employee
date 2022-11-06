@@ -25,12 +25,26 @@ class _AddExpenseState extends State<AddExpense> {
         }));
   }
 
+  TextEditingController _itemName = TextEditingController();
+  TextEditingController _itemDescription = TextEditingController();
+  TextEditingController _itemQuantity = TextEditingController();
+  TextEditingController _itemPrice = TextEditingController();
+  TextEditingController _itemDate = TextEditingController();
   final formKey = GlobalKey<FormState>();
   String itemName = '';
   String itemDescription = '';
   String itemQuantity = '';
   String itemPrice = '';
   String itemDate = DateTime.now().toString();
+  @override
+  void dispose() {
+    _itemName.dispose();
+    _itemDescription.dispose();
+    _itemQuantity.dispose();
+    _itemPrice.dispose();
+    _itemDate.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +85,7 @@ class _AddExpenseState extends State<AddExpense> {
                     height: 10,
                   ),
                   TextFormField(
+                    controller: _itemName,
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Name can\'t be empty';
@@ -114,6 +129,7 @@ class _AddExpenseState extends State<AddExpense> {
                     height: 10,
                   ),
                   TextFormField(
+                    controller: _itemDescription,
                     maxLines: 3,
                     validator: (value) {
                       if (value.isEmpty) {
@@ -162,6 +178,7 @@ class _AddExpenseState extends State<AddExpense> {
                           height: 10,
                         ),
                         TextFormField(
+                          controller: _itemPrice,
                           validator: (value) {
                             if (value.isEmpty) {
                               return 'Can\'t be empty';
@@ -208,6 +225,7 @@ class _AddExpenseState extends State<AddExpense> {
                           height: 10,
                         ),
                         TextFormField(
+                          controller: _itemQuantity,
                           validator: (value) {
                             if (value.isEmpty) {
                               return 'Can\'t be empty';
@@ -274,6 +292,10 @@ class _AddExpenseState extends State<AddExpense> {
                     'itemPrice': itemPrice,
                     'itemDescription': itemDescription,
                   });
+                  _itemName.clear();
+                  _itemQuantity.clear();
+                  _itemPrice.clear();
+                  _itemDescription.clear();
                   Navigator.of(context).pop();
                 }
               },

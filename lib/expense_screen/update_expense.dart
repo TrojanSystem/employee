@@ -31,20 +31,35 @@ class _UpdateExpenseState extends State<UpdateExpense> {
       lastDate: DateTime(DateTime.now().year + 1),
       firstDate: DateTime(DateTime.now().month + 1),
     ).then((value) => setState(() {
-      if (value != null) {
-        itemDate = value.toString();
-      } else {
-        itemDate = DateTime.now().toString();
-      }
-    }));
+          if (value != null) {
+            itemDate = value.toString();
+          } else {
+            itemDate = DateTime.now().toString();
+          }
+        }));
   }
 
   final formKey = GlobalKey<FormState>();
+  TextEditingController _itemName = TextEditingController();
+  TextEditingController _itemDescription = TextEditingController();
+  TextEditingController _itemQuantity = TextEditingController();
+  TextEditingController _itemPrice = TextEditingController();
+  TextEditingController _itemDate = TextEditingController();
+
   String itemName = '';
   String itemDescription = '';
   String itemQuantity = '';
   String itemPrice = '';
   String itemDate = DateTime.now().toString();
+  @override
+  void dispose() {
+    _itemName.dispose();
+    _itemDescription.dispose();
+    _itemQuantity.dispose();
+    _itemPrice.dispose();
+    _itemDate.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -288,12 +303,17 @@ class _UpdateExpenseState extends State<UpdateExpense> {
                         .collection('EmployeeExpenses')
                         .doc(widget.index)
                         .update({
+                      'expenseType': 'employee',
                       'itemName': itemName,
                       'itemDate': itemDate,
                       'itemQuantity': itemQuantity,
                       'itemPrice': itemPrice,
                       'itemDescription': itemDescription,
                     });
+                    _itemName.clear();
+                    _itemQuantity.clear();
+                    _itemPrice.clear();
+                    _itemDescription.clear();
                     Fluttertoast.showToast(
                         msg: "Updated",
                         toastLength: Toast.LENGTH_SHORT,

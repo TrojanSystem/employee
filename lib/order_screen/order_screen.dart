@@ -84,7 +84,9 @@ class _OrderScreenState extends State<OrderScreen> {
                     selectedDayOfMonth)
                 .toList();
             var dailyOrder = dailyOrderType
-                .where((element) => element['orderType'] == 'employee')
+                .where((element) =>
+            element['orderType'] == 'employee'
+                )
                 .toList();
             double totOrderedKg = 0;
             double totPriceOrder = 0;
@@ -174,7 +176,7 @@ class _OrderScreenState extends State<OrderScreen> {
                           : ListView.builder(
                               itemCount: dailyOrder.length,
                               itemBuilder: (context, index) {
-                                int remainBirr = int.parse(
+                                int remain = int.parse(
                                         dailyOrder[index]['totalAmount']) -
                                     int.parse(dailyOrder[index]['payed']);
                                 return Slidable(
@@ -192,9 +194,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 .push(MaterialPageRoute(
                                               builder: (context) =>
                                                   UpdateOrderReceived(
-                                                id: orderData[index]
-                                                    .id
-                                                    .toString(),
+                                                id: orderData[index].id,
                                                 existedName: dailyOrder[index]
                                                     ['name'],
                                                 existedOrderedKilo:
@@ -209,8 +209,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 existedPricePerKG:
                                                     dailyOrder[index]
                                                         ['pricePerKG'],
-                                                existedRemain: dailyOrder[index]
-                                                    ['remain'],
+                                                existedPayed: dailyOrder[index]
+                                                    ['payed'],
                                                 existedDateTime:
                                                     dailyOrder[index]['date'],
                                               ),
@@ -250,7 +250,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                               ),
                                             ],
                                             content: const Text(
-                                                'Do you want to remove the Labour from the List?'),
+                                                'Do you want to remove the order from the List?'),
                                           ),
                                         ),
                                         icon: const Icon(
@@ -451,7 +451,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                 fontSize: 18),
                                                           ),
                                                           Text(
-                                                            'Remain: $remainBirr',
+                                                            'Remain: $remain',
                                                             style: const TextStyle(
                                                                 fontWeight:
                                                                     FontWeight
