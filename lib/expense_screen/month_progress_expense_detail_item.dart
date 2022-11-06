@@ -5,25 +5,25 @@ class MonthProgressExpenseDetailItem extends StatelessWidget {
   final List todayFilteredList;
   final int index;
 
-  MonthProgressExpenseDetailItem({this.todayFilteredList, this.index});
+  const MonthProgressExpenseDetailItem({this.todayFilteredList, this.index});
 
   @override
   Widget build(BuildContext context) {
     var filteredName =
-        todayFilteredList.map((e) => e.itemName).toSet().toList();
+        todayFilteredList.map((e) => e['itemName']).toSet().toList();
     filteredName.sort();
     var x = todayFilteredList
-        .where((e) => e.itemName.toString() == filteredName[index])
+        .where((e) => e['itemName'].toString() == filteredName[index])
         .toList();
 
-    var totalSells = todayFilteredList.map((e) => e.itemPrice).toList();
+    var totalSells = todayFilteredList.map((e) => e['itemPrice']).toList();
 
     double totSum = 0.0;
     for (int xx = 0; xx < totalSells.length; xx++) {
       totSum += (double.parse(totalSells[xx]));
     }
-    var z = x.map((e) => e.itemName).toList();
-    var zz = x.map((e) => e.itemPrice).toList();
+    var z = x.map((e) => e['itemName']).toList();
+    var zz = x.map((e) => e['itemPrice']).toList();
     var sum = 0.0;
     for (int x = 0; x < z.length; x++) {
       sum += double.parse(zz[x]);

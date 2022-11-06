@@ -1,29 +1,44 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
-class UpdateExpense extends StatefulWidget {
-  var index;
-  String existedItemName;
-  String existedItemDate;
-  String existedItemPrice;
-  String existedItemQuantity;
-  String existedItemDescription;
-  UpdateExpense({
-    this.index,
-    this.existedItemDate,
-    this.existedItemDescription,
-    this.existedItemName,
-    this.existedItemPrice,
-    this.existedItemQuantity,
-  });
-
+class UpdateOrderReceived extends StatefulWidget {
+  var id = '';
+  String existedName = '';
+  String existedPhoneNumber = '';
+  String existedOrderedKilo = '';
+  String existedPricePerKG = '';
+  String existedTotalAmount = '';
+  String existedRemain = '';
+  String existedDateTime = '';
+  UpdateOrderReceived(
+      {this.existedDateTime,
+      this.id,
+      this.existedName,
+      this.existedOrderedKilo,
+      this.existedPhoneNumber,
+      this.existedPricePerKG,
+      this.existedRemain,
+      this.existedTotalAmount});
   @override
-  State<UpdateExpense> createState() => _UpdateExpenseState();
+  State<UpdateOrderReceived> createState() => _UpdateOrderReceivedState();
 }
 
-class _UpdateExpenseState extends State<UpdateExpense> {
+class _UpdateOrderReceivedState extends State<UpdateOrderReceived> {
+  String _message, body;
+  String _canSendSMSMessage = 'Check is not run.';
+  List<String> people = ['0923675686', '0917920560'];
+  bool sendDirect = false;
+  final formKey = GlobalKey<FormState>();
+  String name = '';
+  String phoneNumber = '';
+  String orderedKilo = '';
+  String pricePerKG = '';
+  String totalAmount = '';
+  String remain = '';
+  String dateTime = DateTime.now().toString();
   void datePicker() {
     showDatePicker(
       context: context,
@@ -31,32 +46,44 @@ class _UpdateExpenseState extends State<UpdateExpense> {
       lastDate: DateTime(DateTime.now().year + 1),
       firstDate: DateTime(DateTime.now().month + 1),
     ).then((value) => setState(() {
-      if (value != null) {
-        itemDate = value.toString();
-      } else {
-        itemDate = DateTime.now().toString();
-      }
-    }));
+          if (value != null) {
+            dateTime = value.toString();
+          } else {
+            dateTime = DateTime.now().toString();
+          }
+        }));
   }
 
-  final formKey = GlobalKey<FormState>();
-  String itemName = '';
-  String itemDescription = '';
-  String itemQuantity = '';
-  String itemPrice = '';
-  String itemDate = DateTime.now().toString();
+  Future<void> _sendSMS(String _messageBody, List<String> number) async {
+    try {
+      String _result = await sendSMS(
+        message: _messageBody,
+        recipients: number,
+        sendDirect: sendDirect,
+      );
+      setState(() => _message = _result);
+    } catch (error) {
+      setState(() => _message = error.toString());
+    }
+  }
+
+  Future<bool> _canSendSMS() async {
+    bool _result = await canSendSMS();
+    setState(() => _canSendSMSMessage =
+        _result ? 'This unit can send SMS' : 'This unit cannot send SMS');
+    return _result;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
         toolbarHeight: 80,
         centerTitle: true,
         title: const Text(
-          'Expenses',
+          'Update Order',
           style: TextStyle(
             fontSize: 22,
             color: Colors.black,
@@ -68,9 +95,8 @@ class _UpdateExpenseState extends State<UpdateExpense> {
         key: formKey,
         child: ListView(
           children: [
-            const Divider(color: Colors.grey, thickness: 1),
             Padding(
-              padding: const EdgeInsets.fromLTRB(18, 28, 18, 8),
+              padding: const EdgeInsets.fromLTRB(35, 8, 35, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -82,10 +108,10 @@ class _UpdateExpenseState extends State<UpdateExpense> {
                     ),
                   ),
                   const SizedBox(
-                    height: 10,
+                    height: 5,
                   ),
                   TextFormField(
-                    initialValue: widget.existedItemName,
+                    initialValue: widget.existedName,
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Name can\'t be empty';
@@ -94,10 +120,10 @@ class _UpdateExpenseState extends State<UpdateExpense> {
                       }
                     },
                     onSaved: (value) {
-                      itemName = value;
+                      name = value;
                     },
                     decoration: InputDecoration(
-                      hintText: 'Enter Name',
+                      hintText: 'Enter the name',
                       filled: true,
                       fillColor: Colors.grey[200],
                       enabledBorder: OutlineInputBorder(
@@ -114,35 +140,34 @@ class _UpdateExpenseState extends State<UpdateExpense> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
+              padding: const EdgeInsets.fromLTRB(35, 8, 35, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Description',
+                    'Phone Number',
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 18,
                     ),
                   ),
                   const SizedBox(
-                    height: 10,
+                    height: 5,
                   ),
                   TextFormField(
-                    initialValue: widget.existedItemDescription,
-                    maxLines: 3,
+                    initialValue: widget.existedPhoneNumber,
                     validator: (value) {
                       if (value.isEmpty) {
-                        return 'Description can\'t be empty';
+                        return 'Phone Number can\'t be empty';
                       } else {
                         return null;
                       }
                     },
                     onSaved: (value) {
-                      itemDescription = value;
+                      phoneNumber = value;
                     },
                     decoration: InputDecoration(
-                      hintText: 'Enter Description',
+                      hintText: 'Enter phone number',
                       filled: true,
                       fillColor: Colors.grey[200],
                       enabledBorder: OutlineInputBorder(
@@ -158,17 +183,61 @@ class _UpdateExpenseState extends State<UpdateExpense> {
                 ],
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(35, 8, 35, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Date',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 18,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(top: 20, left: 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.grey[200],
+                        ),
+                        width: 250,
+                        height: 60,
+                        child: Text(
+                          'Date is set to : ${DateFormat.yMEd().format(DateTime.parse(dateTime))}',
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            datePicker();
+                          });
+                        },
+                        icon: const Icon(Icons.calendar_today),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
             Row(
               children: [
                 Expanded(
                   flex: 1,
                   child: Container(
-                    margin: const EdgeInsets.fromLTRB(25, 8, 25, 8),
+                    padding: const EdgeInsets.fromLTRB(35, 8, 35, 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Price',
+                          'Ordered Kilo',
                           style: TextStyle(
                             fontWeight: FontWeight.w900,
                             fontSize: 18,
@@ -178,7 +247,7 @@ class _UpdateExpenseState extends State<UpdateExpense> {
                           height: 10,
                         ),
                         TextFormField(
-                          initialValue: widget.existedItemPrice,
+                          initialValue: widget.existedOrderedKilo,
                           validator: (value) {
                             if (value.isEmpty) {
                               return 'Can\'t be empty';
@@ -187,10 +256,10 @@ class _UpdateExpenseState extends State<UpdateExpense> {
                             }
                           },
                           onSaved: (value) {
-                            itemPrice = value;
+                            orderedKilo = value;
                           },
                           decoration: InputDecoration(
-                            hintText: 'Price',
+                            hintText: 'Enter Kilo',
                             filled: true,
                             fillColor: Colors.grey[200],
                             enabledBorder: OutlineInputBorder(
@@ -210,12 +279,12 @@ class _UpdateExpenseState extends State<UpdateExpense> {
                 Expanded(
                   flex: 1,
                   child: Container(
-                    margin: const EdgeInsets.fromLTRB(25, 8, 25, 8),
+                    padding: const EdgeInsets.fromLTRB(35, 8, 35, 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Quantity',
+                          'Price/KG',
                           style: TextStyle(
                             fontWeight: FontWeight.w900,
                             fontSize: 18,
@@ -225,7 +294,7 @@ class _UpdateExpenseState extends State<UpdateExpense> {
                           height: 10,
                         ),
                         TextFormField(
-                          initialValue: widget.existedItemQuantity,
+                          initialValue: widget.existedPricePerKG,
                           validator: (value) {
                             if (value.isEmpty) {
                               return 'Can\'t be empty';
@@ -234,10 +303,10 @@ class _UpdateExpenseState extends State<UpdateExpense> {
                             }
                           },
                           onSaved: (value) {
-                            itemQuantity = value;
+                            pricePerKG = value;
                           },
                           decoration: InputDecoration(
-                            hintText: 'Quantity',
+                            hintText: 'Enter Price',
                             filled: true,
                             fillColor: Colors.grey[200],
                             enabledBorder: OutlineInputBorder(
@@ -256,43 +325,122 @@ class _UpdateExpenseState extends State<UpdateExpense> {
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 28, 18, 8),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        datePicker();
-                      });
-                    },
-                    icon: const Icon(Icons.calendar_today),
+            Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(25, 8, 25, 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Total Amount',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                          initialValue: widget.existedTotalAmount,
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Can\'t be empty';
+                            } else {
+                              return null;
+                            }
+                          },
+                          onSaved: (value) {
+                            totalAmount = value;
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Total',
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    DateFormat.yMEd().format(DateTime.parse(itemDate)),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(25, 8, 25, 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Remain',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                          initialValue: widget.existedRemain,
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Can\'t be empty';
+                            } else {
+                              return null;
+                            }
+                          },
+                          onSaved: (value) {
+                            remain = value;
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Remain',
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(
-              height: 30,
-            ),
+            //button
             GestureDetector(
               onTap: () async {
                 if (formKey.currentState.validate()) {
                   formKey.currentState.save();
-
                   try {
                     await FirebaseFirestore.instance
-                        .collection('EmployeeExpenses')
-                        .doc(widget.index)
+                        .collection('OrderData')
+                        .doc(widget.id)
                         .update({
-                      'itemName': itemName,
-                      'itemDate': itemDate,
-                      'itemQuantity': itemQuantity,
-                      'itemPrice': itemPrice,
-                      'itemDescription': itemDescription,
+                      'name': name,
+                      'remain': remain,
+                      'pricePerKG': pricePerKG,
+                      'totalAmount': totalAmount,
+                      'orderedKilo': orderedKilo,
+                      'phoneNumber': phoneNumber,
+                      'date': dateTime,
+                      'orderReceivedDate': DateTime.now().toString()
                     });
                     Fluttertoast.showToast(
                         msg: "Updated",
@@ -302,7 +450,11 @@ class _UpdateExpenseState extends State<UpdateExpense> {
                         backgroundColor: Colors.green,
                         textColor: Colors.white,
                         fontSize: 18.0);
-
+                    _sendSMS(
+                        '${orderedKilo}kg ለ ${DateFormat.E().format(
+                          DateTime.parse(dateTime),
+                        )}',
+                        people);
                     Navigator.of(context).pop();
                   } catch (e) {
                     showDialog(
@@ -331,7 +483,7 @@ class _UpdateExpenseState extends State<UpdateExpense> {
                 }
               },
               child: Container(
-                margin: const EdgeInsets.fromLTRB(25, 20, 25, 0),
+                margin: const EdgeInsets.fromLTRB(130, 10, 130, 0),
                 width: double.infinity,
                 height: 60.0,
                 decoration: BoxDecoration(
@@ -340,7 +492,7 @@ class _UpdateExpenseState extends State<UpdateExpense> {
                 ),
                 child: const Center(
                   child: Text(
-                    'Update Expense',
+                    'Update',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,

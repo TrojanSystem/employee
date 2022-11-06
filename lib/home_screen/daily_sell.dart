@@ -550,7 +550,7 @@ class _DailySellState extends State<DailySell> {
                                         ),
                                       ),
                                       const SizedBox(
-                                        width: 20,
+                                        width: 15,
                                       ),
                                       Text('Tot Daily Income: $totalSold',
                                           style: const TextStyle(

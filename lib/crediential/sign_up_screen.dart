@@ -272,8 +272,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         setState(() {
                           _isRegistering = false;
                         });
-                        FirebaseFirestore.instance.collection('LoggedUser').add(
-                            {'username': username, 'userEmail': userEmail});
+                        FirebaseFirestore.instance
+                            .collection('LoggedUser')
+                            .add({
+                          'username': username,
+                          'userEmail': userEmail,
+                          'loggedDate': DateTime.now().toString()
+                        });
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
                             builder: (ctx) => HomePage(),

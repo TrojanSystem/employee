@@ -1,17 +1,31 @@
 import 'package:ada_bread/crediential/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../data_provider.dart';
 
 class BottomUserInfo extends StatelessWidget {
   final bool isCollapsed;
 
-  const BottomUserInfo({
+  BottomUserInfo({
     Key key,
     this.isCollapsed,
   }) : super(key: key);
+  String currentUser = '';
 
+  String currentUserName = '';
+  final loggedUser = FirebaseAuth.instance.currentUser.email;
+  String currentProfilePic = '';
   @override
   Widget build(BuildContext context) {
+    final loggedInUser = Provider.of<DataProvider>(context).loggedUserList;
+    for (var message in loggedInUser) {
+      if (message['userEmail'] == loggedUser) {
+        currentUser = message['userEmail'];
+        currentUserName = message['username'];
+      }
+    }
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       height: isCollapsed ? 70 : 100,
@@ -48,13 +62,13 @@ class BottomUserInfo extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Expanded(
                           child: Align(
                             alignment: Alignment.bottomLeft,
                             child: Text(
-                              'Surafel Terefe',
-                              style: TextStyle(
+                              currentUserName,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
@@ -64,7 +78,7 @@ class BottomUserInfo extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Expanded(
+                        const Expanded(
                           child: Text(
                             'Seller',
                             style: TextStyle(

@@ -16,12 +16,20 @@ class _DfoOrderState extends State<DfoOrder> {
   List<String> people = ['0923675686', '0917920560'];
   bool sendDirect = false;
   final formKey = GlobalKey<FormState>();
+  final TextEditingController _name = TextEditingController();
+  final TextEditingController _phoneNumber = TextEditingController();
+  final TextEditingController _orderedKilo = TextEditingController();
+  final TextEditingController _pricePerKG = TextEditingController();
+  final TextEditingController _totalAmount = TextEditingController();
+  final TextEditingController _remain = TextEditingController();
   String name = '';
   String phoneNumber = '';
   String orderedKilo = '';
   String pricePerKG = '';
   String totalAmount = '';
-  String remain = '';
+  String payed = '';
+  int totBzet = 0;
+  int totPricePerKg = 0;
   String dateTime = DateTime.now().toString();
   void datePicker() {
     showDatePicker(
@@ -30,12 +38,12 @@ class _DfoOrderState extends State<DfoOrder> {
       lastDate: DateTime(DateTime.now().year + 1),
       firstDate: DateTime(DateTime.now().month + 1),
     ).then((value) => setState(() {
-          if (value != null) {
-            dateTime = value.toString();
-          } else {
-            dateTime = DateTime.now().toString();
-          }
-        }));
+      if (value != null) {
+        dateTime = value.toString();
+      } else {
+        dateTime = DateTime.now().toString();
+      }
+    }));
   }
 
   Future<void> _sendSMS(String _messageBody, List<String> number) async {
@@ -54,8 +62,19 @@ class _DfoOrderState extends State<DfoOrder> {
   Future<bool> _canSendSMS() async {
     bool _result = await canSendSMS();
     setState(() => _canSendSMSMessage =
-        _result ? 'This unit can send SMS' : 'This unit cannot send SMS');
+    _result ? 'This unit can send SMS' : 'This unit cannot send SMS');
     return _result;
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _orderedKilo.dispose();
+    _pricePerKG.dispose();
+    _totalAmount.dispose();
+    _remain.dispose();
+    _phoneNumber.dispose();
+    super.dispose();
   }
 
   @override
@@ -95,6 +114,7 @@ class _DfoOrderState extends State<DfoOrder> {
                     height: 5,
                   ),
                   TextFormField(
+                    controller: _name,
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Name can\'t be empty';
@@ -138,6 +158,7 @@ class _DfoOrderState extends State<DfoOrder> {
                     height: 5,
                   ),
                   TextFormField(
+                    controller: _phoneNumber,
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Phone Number can\'t be empty';
@@ -229,12 +250,18 @@ class _DfoOrderState extends State<DfoOrder> {
                           height: 10,
                         ),
                         TextFormField(
+                          controller: _orderedKilo,
                           validator: (value) {
                             if (value.isEmpty) {
                               return 'Can\'t be empty';
                             } else {
                               return null;
                             }
+                          },
+                          onChanged: (value) {
+                            setState(() {
+                              totBzet = int.parse(value);
+                            });
                           },
                           onSaved: (value) {
                             orderedKilo = value;
@@ -275,12 +302,18 @@ class _DfoOrderState extends State<DfoOrder> {
                           height: 10,
                         ),
                         TextFormField(
+                          controller: _pricePerKG,
                           validator: (value) {
                             if (value.isEmpty) {
                               return 'Can\'t be empty';
                             } else {
                               return null;
                             }
+                          },
+                          onChanged: (value) {
+                            setState(() {
+                              totPricePerKg = int.parse(value);
+                            });
                           },
                           onSaved: (value) {
                             pricePerKG = value;
@@ -309,8 +342,52 @@ class _DfoOrderState extends State<DfoOrder> {
               children: [
                 Expanded(
                   flex: 1,
-                  child: Container(
-                    margin: const EdgeInsets.fromLTRB(25, 8, 25, 8),
+                  // child: Container(
+                  //   margin: const EdgeInsets.fromLTRB(25, 8, 25, 8),
+                  //   child: Column(
+                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                  //     children: [
+                  //       Text(
+                  //         totBzet.toString(),
+                  //         style: const TextStyle(
+                  //           fontWeight: FontWeight.w900,
+                  //           fontSize: 18,
+                  //         ),
+                  //       ),
+                  //       const SizedBox(
+                  //         height: 10,
+                  //       ),
+                  //       TextFormField(
+                  //         controller: _totalAmount,
+                  //         validator: (value) {
+                  //           if (value.isEmpty) {
+                  //             return 'Can\'t be empty';
+                  //           } else {
+                  //             return null;
+                  //           }
+                  //         },
+                  //         onSaved: (value) {
+                  //           totalAmount = value;
+                  //         },
+                  //         decoration: InputDecoration(
+                  //           hintText: 'Total',
+                  //           filled: true,
+                  //           fillColor: Colors.grey[200],
+                  //           enabledBorder: OutlineInputBorder(
+                  //             borderSide: BorderSide.none,
+                  //             borderRadius: BorderRadius.circular(10),
+                  //           ),
+                  //           focusedBorder: OutlineInputBorder(
+                  //             borderSide: BorderSide.none,
+                  //             borderRadius: BorderRadius.circular(10),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(35, 8, 8, 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -324,28 +401,19 @@ class _DfoOrderState extends State<DfoOrder> {
                         const SizedBox(
                           height: 10,
                         ),
-                        TextFormField(
-                          validator: (value) {
-                            if (value.isEmpty) {
-                              return 'Can\'t be empty';
-                            } else {
-                              return null;
-                            }
-                          },
-                          onSaved: (value) {
-                            totalAmount = value;
-                          },
-                          decoration: InputDecoration(
-                            hintText: 'Total',
-                            filled: true,
-                            fillColor: Colors.grey[200],
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(10),
+                        Container(
+                          padding: const EdgeInsets.only(top: 20, left: 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey[200],
+                          ),
+                          width: 120,
+                          height: 60,
+                          child: Text(
+                            '${totBzet * totPricePerKg}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 18,
                             ),
                           ),
                         ),
@@ -361,7 +429,7 @@ class _DfoOrderState extends State<DfoOrder> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Remain',
+                          'Payed',
                           style: TextStyle(
                             fontWeight: FontWeight.w900,
                             fontSize: 18,
@@ -371,6 +439,7 @@ class _DfoOrderState extends State<DfoOrder> {
                           height: 10,
                         ),
                         TextFormField(
+                          controller: _remain,
                           validator: (value) {
                             if (value.isEmpty) {
                               return 'Can\'t be empty';
@@ -379,10 +448,10 @@ class _DfoOrderState extends State<DfoOrder> {
                             }
                           },
                           onSaved: (value) {
-                            remain = value;
+                            payed = value;
                           },
                           decoration: InputDecoration(
-                            hintText: 'Remain',
+                            hintText: 'Payed',
                             filled: true,
                             fillColor: Colors.grey[200],
                             enabledBorder: OutlineInputBorder(
@@ -406,10 +475,10 @@ class _DfoOrderState extends State<DfoOrder> {
               onTap: () {
                 if (formKey.currentState.validate()) {
                   formKey.currentState.save();
-
+                  totalAmount = (totBzet * totPricePerKg).toString();
                   FirebaseFirestore.instance.collection('OrderData').add({
                     'name': name,
-                    'remain': remain,
+                    'payed': payed,
                     'pricePerKG': pricePerKG,
                     'totalAmount': totalAmount,
                     'orderedKilo': orderedKilo,
@@ -417,6 +486,12 @@ class _DfoOrderState extends State<DfoOrder> {
                     'date': dateTime,
                     'orderReceivedDate': DateTime.now().toString()
                   });
+                  _name.clear();
+                  _orderedKilo.clear();
+                  _pricePerKG.clear();
+                  _totalAmount.clear();
+                  _remain.clear();
+                  _phoneNumber.clear();
                   _sendSMS(
                       '${orderedKilo}kg ለ ${DateFormat.E().format(
                         DateTime.parse(dateTime),
