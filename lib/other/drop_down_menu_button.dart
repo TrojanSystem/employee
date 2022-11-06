@@ -23,8 +23,8 @@ class DropDownMenuButton extends StatelessWidget {
       // Cannot be `Alignment.center`
       alignment: Alignment.centerRight,
       ringColor: const Color.fromRGBO(3, 83, 151, 1).withOpacity(0.8),
-      ringDiameter: 430.0,
-      ringWidth: 150.0,
+      ringDiameter: 330.0,
+      ringWidth: 120.0,
       fabSize: 50.0,
       fabElevation: 8.0,
       fabIconBorder: const CircleBorder(),
