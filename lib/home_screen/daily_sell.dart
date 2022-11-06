@@ -55,7 +55,7 @@ class _DailySellState extends State<DailySell> {
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(3, 83, 151, 1),
         title: const Text(
-          'Ada Bread',
+          'Ada Bread Employee',
           style: storageTitle,
         ),
         centerTitle: true,

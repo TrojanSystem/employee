@@ -16,6 +16,7 @@ class DropDownMenuButton extends StatelessWidget {
       this.button_4,
       this.primaryColor});
 
+  @override
   Widget build(BuildContext context) {
     return FabCircularMenu(
       key: fabKey,
@@ -40,21 +41,18 @@ class DropDownMenuButton extends StatelessWidget {
       animationCurve: Curves.easeInOutCirc,
       onDisplayChange: (isOpen) {},
       children: <Widget>[
-        Container(
-          // padding: const EdgeInsets.fromLTRB(24.0, 100, 24, 24),
-          child: RawMaterialButton(
-            fillColor: Colors.green,
-            onPressed: () {
-              button_1();
-              fabKey.currentState.close();
-            },
-            shape: const CircleBorder(),
-            //padding: const EdgeInsets.fromLTRB(24.0, 100, 24, 24),
-            child: const Icon(
-              Icons.add,
-              color: Colors.white,
-              size: 35,
-            ),
+        RawMaterialButton(
+          fillColor: Colors.green,
+          onPressed: () {
+            button_1();
+            fabKey.currentState.close();
+          },
+          shape: const CircleBorder(),
+          //padding: const EdgeInsets.fromLTRB(24.0, 100, 24, 24),
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+            size: 35,
           ),
         ),
         RawMaterialButton(
@@ -82,18 +80,18 @@ class DropDownMenuButton extends StatelessWidget {
             width: 50,
           ),
         ),
-        RawMaterialButton(
-          onPressed: () {
-            button_4();
-            fabKey.currentState.close();
-          },
-          shape: const CircleBorder(),
-          padding: const EdgeInsets.all(24.0),
-          child: const Image(
-            image: AssetImage('images/graphic-progression.png'),
-            width: 40,
-          ),
-        )
+        // RawMaterialButton(
+        //   onPressed: () {
+        //     button_4();
+        //     fabKey.currentState.close();
+        //   },
+        //   shape: const CircleBorder(),
+        //   padding: const EdgeInsets.all(24.0),
+        //   child: const Image(
+        //     image: AssetImage('images/graphic-progression.png'),
+        //     width: 40,
+        //   ),
+        // )
       ],
     );
   }

@@ -21,7 +21,9 @@ void main() async {
           create: (BuildContext context) => DataStorage(),
         ),
         ChangeNotifierProvider(
-          create: (BuildContext context) => DataProvider()..loadLoggedUser(),
+          create: (BuildContext context) => DataProvider()
+            ..loadLoggedUser()
+            ..loadExpenseList(),
         ),
         ChangeNotifierProvider(
           create: (BuildContext context) => OrderDataHub(),
