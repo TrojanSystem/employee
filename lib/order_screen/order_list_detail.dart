@@ -31,11 +31,13 @@ class _OrderListItemState extends State<OrderListItem> {
             DateTime.parse(element['date']).year == DateTime.now().year)
         .toList();
 
-    var orderListDetail = result
+    var orderListDetailType = result
         .where(
             (element) => DateTime.parse(element['date']).month == selectedMonth)
         .toList();
-
+    var orderListDetail = orderListDetailType
+        .where((element) => element['orderType'] == 'employee')
+        .toList();
     double totOrderedKg = 0;
     double totPriceOrder = 0;
     var quantityOfBread = orderListDetail.map((e) => e['orderedKilo']).toList();

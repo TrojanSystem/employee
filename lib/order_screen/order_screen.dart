@@ -78,10 +78,13 @@ class _OrderScreenState extends State<OrderScreen> {
                     DateTime.parse(element['orderReceivedDate']).month ==
                     DateTime.now().month)
                 .toList();
-            var dailyOrder = todayMonthFilteredList
+            var dailyOrderType = todayMonthFilteredList
                 .where((element) =>
                     DateTime.parse(element['orderReceivedDate']).day ==
                     selectedDayOfMonth)
+                .toList();
+            var dailyOrder = dailyOrderType
+                .where((element) => element['orderType'] == 'employee')
                 .toList();
             double totOrderedKg = 0;
             double totPriceOrder = 0;

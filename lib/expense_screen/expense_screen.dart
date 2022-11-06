@@ -62,7 +62,10 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                     DateTime.parse(element['itemDate']).month ==
                     DateTime.now().month)
                 .toList();
-            var dailyExpense = todayMonthFilteredList
+            var dailyExpenseType = todayMonthFilteredList
+                .where((element) => element['expenseType'] == 'employee')
+                .toList();
+            var dailyExpense = dailyExpenseType
                 .where((element) =>
                     DateTime.parse(element['itemDate']).day ==
                     selectedDayOfMonth)

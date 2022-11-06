@@ -267,6 +267,7 @@ class _AddExpenseState extends State<AddExpense> {
                   FirebaseFirestore.instance
                       .collection('EmployeeExpenses')
                       .add({
+                    'expenseType': 'employee',
                     'itemName': itemName,
                     'itemDate': itemDate,
                     'itemQuantity': itemQuantity,

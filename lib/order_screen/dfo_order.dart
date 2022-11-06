@@ -38,12 +38,12 @@ class _DfoOrderState extends State<DfoOrder> {
       lastDate: DateTime(DateTime.now().year + 1),
       firstDate: DateTime(DateTime.now().month + 1),
     ).then((value) => setState(() {
-      if (value != null) {
-        dateTime = value.toString();
-      } else {
-        dateTime = DateTime.now().toString();
-      }
-    }));
+          if (value != null) {
+            dateTime = value.toString();
+          } else {
+            dateTime = DateTime.now().toString();
+          }
+        }));
   }
 
   Future<void> _sendSMS(String _messageBody, List<String> number) async {
@@ -62,7 +62,7 @@ class _DfoOrderState extends State<DfoOrder> {
   Future<bool> _canSendSMS() async {
     bool _result = await canSendSMS();
     setState(() => _canSendSMSMessage =
-    _result ? 'This unit can send SMS' : 'This unit cannot send SMS');
+        _result ? 'This unit can send SMS' : 'This unit cannot send SMS');
     return _result;
   }
 
@@ -477,6 +477,7 @@ class _DfoOrderState extends State<DfoOrder> {
                   formKey.currentState.save();
                   totalAmount = (totBzet * totPricePerKg).toString();
                   FirebaseFirestore.instance.collection('OrderData').add({
+                    'orderType': 'employee',
                     'name': name,
                     'payed': payed,
                     'pricePerKG': pricePerKG,
