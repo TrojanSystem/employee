@@ -15,14 +15,12 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (ctx) => DataProvider()..loadSoldList(),
-        ),
-        ChangeNotifierProvider(
           create: (BuildContext context) => DataStorage(),
         ),
         ChangeNotifierProvider(
           create: (BuildContext context) => DataProvider()
             ..loadLoggedUser()
+            ..loadSoldList()
             ..loadExpenseList(),
         ),
         ChangeNotifierProvider(

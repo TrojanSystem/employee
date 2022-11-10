@@ -229,10 +229,12 @@ class _LoginDemoState extends State<LoginDemo> {
                         setState(() {
                           _isLoading = false;
                         });
-                        String v4Crypto = Provider.of<DataProvider>(context)
-                            .loggedUseUniqueID;
+                        String v4Crypto =
+                            Provider.of<DataProvider>(context, listen: false)
+                                .loggedUseUniqueID;
                         String userName =
-                            Provider.of<DataProvider>(context).loggedUserName;
+                            Provider.of<DataProvider>(context, listen: false)
+                                .loggedUserName;
                         FirebaseFirestore.instance
                             .collection('LoggedUser')
                             .doc(v4Crypto)
