@@ -56,7 +56,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                     DateTime.parse(element['itemDate']).year ==
                     DateTime.now().year)
                 .toList();
-
+            var resultEmployee = result
+                .where((element) => element['expenseType'] == 'employee')
+                .toList();
             var todayMonthFilteredList = result
                 .where((element) =>
                     DateTime.parse(element['itemDate']).month ==
@@ -70,9 +72,10 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                     DateTime.parse(element['itemDate']).day ==
                     selectedDayOfMonth)
                 .toList();
-            var totalExpenses = result.map((e) => e['itemPrice']).toList();
+            var totalExpenses =
+                resultEmployee.map((e) => e['itemPrice']).toList();
             var totalExpensesQuantity =
-                result.map((e) => e['itemQuantity']).toList();
+                resultEmployee.map((e) => e['itemQuantity']).toList();
             var totExpenseSum = 0.0;
             for (int xx = 0; xx < totalExpenses.length; xx++) {
               totExpenseSum += (double.parse(totalExpenses[xx]) *

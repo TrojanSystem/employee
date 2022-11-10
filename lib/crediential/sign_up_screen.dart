@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+import 'package:uuid/uuid_util.dart';
 
 import '../data_provider.dart';
 import '../home_page.dart';
@@ -269,12 +271,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       final user = await auth.createUserWithEmailAndPassword(
                           email: userEmail, password: userPassword);
                       if (user != null) {
+                        var uuid = const Uuid();
+                        var v4Crypto =
+                            uuid.v4(options: {'rng': UuidUtil.cryptoRNG});
+                        Provider.of<DataProvider>(context, listen: false)
+                            .loggedUseUniqueID = v4Crypto;
                         setState(() {
                           _isRegistering = false;
                         });
                         FirebaseFirestore.instance
                             .collection('LoggedUser')
-                            .add({
+                            .doc(v4Crypto)
+                            .set({
+                          'userNameID': v4Crypto,
                           'username': username,
                           'userEmail': userEmail,
                           'loggedDate': DateTime.now().toString()
@@ -286,7 +295,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         );
                         setState(() {
                           Provider.of<DataProvider>(context, listen: false)
-                              .checker(auth.currentUser.email);
+                              .checker(auth.currentUser.email, username);
                         });
                       }
                     } catch (e) {

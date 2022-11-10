@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 class DataProvider extends ChangeNotifier {
   final List<Map<String, dynamic>> expenseList = [];
   String loggedUserEmail = '';
+  String loggedUseUniqueID = '';
+  String loggedUserName = '';
   String totalSoldIncome = '';
   String totalExpectedIncome = '';
   String totalAppbarSoldIncome = '';
@@ -11,8 +13,14 @@ class DataProvider extends ChangeNotifier {
 
   final List<Map<String, dynamic>> dailyShopData = [];
   final List<Map<String, dynamic>> loggedUserList = [];
-  checker(String userEmail) {
+  checker(String userEmail, userName) {
     loggedUserEmail = userEmail;
+    loggedUserName = userName;
+    notifyListeners();
+  }
+
+  uniqueID(String ID) {
+    loggedUseUniqueID = ID;
 
     notifyListeners();
   }

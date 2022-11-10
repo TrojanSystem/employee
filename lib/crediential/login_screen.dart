@@ -1,5 +1,6 @@
 import 'package:ada_bread/crediential/forgot_password.dart';
 import 'package:ada_bread/crediential/sign_up_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -228,6 +229,19 @@ class _LoginDemoState extends State<LoginDemo> {
                         setState(() {
                           _isLoading = false;
                         });
+                        String v4Crypto = Provider.of<DataProvider>(context)
+                            .loggedUseUniqueID;
+                        String userName =
+                            Provider.of<DataProvider>(context).loggedUserName;
+                        FirebaseFirestore.instance
+                            .collection('LoggedUser')
+                            .doc(v4Crypto)
+                            .set({
+                          'userNameID': v4Crypto,
+                          'username': userName,
+                          'userEmail': userEmail,
+                          'loggedDate': DateTime.now().toString()
+                        });
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
                             builder: (ctx) => HomePage(),
@@ -235,7 +249,7 @@ class _LoginDemoState extends State<LoginDemo> {
                         );
                         setState(() {
                           Provider.of<DataProvider>(context, listen: false)
-                              .checker(auth.currentUser.email);
+                              .checker(auth.currentUser.email, userName);
                         });
                       }
                     } catch (e) {
