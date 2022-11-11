@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class DataProvider extends ChangeNotifier {
   List<QueryDocumentSnapshot<Object>> expenseList = [];
+  List<QueryDocumentSnapshot<Object>> databaseDataForShop = [];
   String loggedUserEmail = '';
   String loggedUseUniqueID = '';
   String loggedUserName = '';

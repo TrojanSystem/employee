@@ -1,7 +1,7 @@
 import 'package:ada_bread/data_provider.dart';
 import 'package:ada_bread/data_storage.dart';
 import 'package:ada_bread/home_screen/production_input.dart';
-import 'package:ada_bread/home_screen/shop_analysis.dart';
+import 'package:ada_bread/home_screen/seller_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -137,6 +137,7 @@ class _DailySellState extends State<DailySell> {
                   );
                 }
                 productionData = snapshot.data.docs;
+
                 /*
                 *
                 * GIVEN ITEM
@@ -147,6 +148,8 @@ class _DailySellState extends State<DailySell> {
                 final itemTypeForAdmin = productionData
                     .where((element) => element['isWhat'] == 'given')
                     .toList();
+                Provider.of<DataProvider>(context).databaseDataForShop =
+                    productionData;
                 final whoIsForAdmin = itemTypeForAdmin
                     .where((element) => element['seller'] == loggedEmail)
                     .toList();
@@ -677,7 +680,7 @@ class _DailySellState extends State<DailySell> {
           button_3: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (ctx) => ShopAnalysis(monthlyOrder: result),
+                builder: (ctx) => const SellerDetail(),
               ),
             );
           },
