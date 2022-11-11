@@ -84,9 +84,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     selectedDayOfMonth)
                 .toList();
             var dailyOrder = dailyOrderType
-                .where((element) =>
-            element['orderType'] == 'employee'
-                )
+                .where((element) => element['orderType'] == 'employee')
                 .toList();
             double totOrderedKg = 0;
             double totPriceOrder = 0;
@@ -513,23 +511,22 @@ class _OrderScreenState extends State<OrderScreen> {
           }),
       floatingActionButton: Builder(
         builder: (context) => DropDownMenuButton(
-            primaryColor: Colors.red,
-            button_1: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (ctx) => const DfoOrder(),
-                ),
-              );
-            },
-            button_2: () {},
-            button_3: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (ctx) => OrderListItem(monthlyOrder: result),
-                ),
-              );
-            },
-            button_4: () {}),
+          primaryColor: Colors.red,
+          button_1: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) => const DfoOrder(),
+              ),
+            );
+          },
+          button_3: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) => OrderListItem(monthlyOrder: result),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

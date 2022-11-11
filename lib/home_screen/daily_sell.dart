@@ -665,24 +665,23 @@ class _DailySellState extends State<DailySell> {
       ),
       floatingActionButton: Builder(
         builder: (context) => DropDownMenuButton(
-            primaryColor: Colors.red,
-            button_1: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (ctx) =>
-                      ProductionInput(shopEmployeeEmail: loggedEmail),
-                ),
-              );
-            },
-            button_2: () {},
-            button_3: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (ctx) => ShopAnalysis(monthlyOrder: result),
-                ),
-              );
-            },
-            button_4: () {}),
+          primaryColor: Colors.red,
+          button_1: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) =>
+                    ProductionInput(shopEmployeeEmail: loggedEmail),
+              ),
+            );
+          },
+          button_3: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) => ShopAnalysis(monthlyOrder: result),
+              ),
+            );
+          },
+        ),
       ),
       drawer: const CustomDrawer(),
     );

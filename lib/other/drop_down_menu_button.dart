@@ -4,17 +4,12 @@ import 'package:flutter/material.dart';
 class DropDownMenuButton extends StatelessWidget {
   final GlobalKey<FabCircularMenuState> fabKey = GlobalKey();
   final Function button_1;
-  final Function button_2;
+
   final Function button_3;
-  final Function button_4;
+
   final Color primaryColor;
 
-  DropDownMenuButton(
-      {this.button_1,
-      this.button_2,
-      this.button_3,
-      this.button_4,
-      this.primaryColor});
+  DropDownMenuButton({this.button_1, this.button_3, this.primaryColor});
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +18,8 @@ class DropDownMenuButton extends StatelessWidget {
       // Cannot be `Alignment.center`
       alignment: Alignment.centerRight,
       ringColor: const Color.fromRGBO(3, 83, 151, 1).withOpacity(0.8),
-      ringDiameter: 330.0,
-      ringWidth: 120.0,
+      ringDiameter: 300.0,
+      ringWidth: 110.0,
       fabSize: 50.0,
       fabElevation: 8.0,
       fabIconBorder: const CircleBorder(),
@@ -57,19 +52,6 @@ class DropDownMenuButton extends StatelessWidget {
         ),
         RawMaterialButton(
           onPressed: () {
-            button_2();
-            fabKey.currentState.close();
-          },
-          shape: const CircleBorder(),
-          //  padding: const EdgeInsets.fromLTRB(24.0, 50, 24, 24),
-          padding: const EdgeInsets.all(24.0),
-          child: const Image(
-            image: AssetImage('images/pdf.png'),
-            width: 40,
-          ),
-        ),
-        RawMaterialButton(
-          onPressed: () {
             button_3();
             fabKey.currentState?.close();
           },
@@ -80,18 +62,6 @@ class DropDownMenuButton extends StatelessWidget {
             width: 50,
           ),
         ),
-        // RawMaterialButton(
-        //   onPressed: () {
-        //     button_4();
-        //     fabKey.currentState.close();
-        //   },
-        //   shape: const CircleBorder(),
-        //   padding: const EdgeInsets.all(24.0),
-        //   child: const Image(
-        //     image: AssetImage('images/graphic-progression.png'),
-        //     width: 40,
-        //   ),
-        // )
       ],
     );
   }
