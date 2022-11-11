@@ -8,11 +8,10 @@ import '../other/constants.dart';
 import '../other/drop_down_menu_button.dart';
 import 'add_expense.dart';
 import 'daily_expense_item.dart';
-import 'daily_expense_pdf_report.dart';
 import 'month_progress_expense_item.dart';
 
 class ExpenseScreen extends StatefulWidget {
-  ExpenseScreen({Key key}) : super(key: key);
+  const ExpenseScreen({Key key}) : super(key: key);
 
   @override
   State<ExpenseScreen> createState() => _ExpenseScreenState();
@@ -49,47 +48,58 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 ),
               );
             }
-            final expense = expenseData.data.docs;
+            final expenseForExpenseScreen = expenseData.data.docs;
 
-            final result = expense
+            final yearlyExpenseFilterForExpenseScreen = expenseForExpenseScreen
                 .where((element) =>
                     DateTime.parse(element['itemDate']).year ==
                     DateTime.now().year)
                 .toList();
-            var resultEmployee = result
+            var dailyExpenseType = yearlyExpenseFilterForExpenseScreen
                 .where((element) => element['expenseType'] == 'employee')
                 .toList();
-            var todayMonthFilteredList = result
+            var monthlyExpenseFilterForExpenseScreen = dailyExpenseType
                 .where((element) =>
                     DateTime.parse(element['itemDate']).month ==
                     DateTime.now().month)
                 .toList();
-            var dailyExpenseType = todayMonthFilteredList
-                .where((element) => element['expenseType'] == 'employee')
-                .toList();
-            var dailyExpense = dailyExpenseType
-                .where((element) =>
-                    DateTime.parse(element['itemDate']).day ==
-                    selectedDayOfMonth)
-                .toList();
-            var totalExpenses =
-                resultEmployee.map((e) => e['itemPrice']).toList();
-            var totalExpensesQuantity =
-                resultEmployee.map((e) => e['itemQuantity']).toList();
-            var totExpenseSum = 0.0;
-            for (int xx = 0; xx < totalExpenses.length; xx++) {
-              totExpenseSum += (double.parse(totalExpenses[xx]) *
-                  double.parse(totalExpensesQuantity[xx]));
+            var dailyExpenseFilterForExpenseScreen =
+                monthlyExpenseFilterForExpenseScreen
+                    .where((element) =>
+                        DateTime.parse(element['itemDate']).day ==
+                        selectedDayOfMonth)
+                    .toList();
+            var listOfYearlyExpenseItemPrice =
+                yearlyExpenseFilterForExpenseScreen
+                    .map((e) => e['itemPrice'])
+                    .toList();
+            var listOfYearlyExpenseItemQuantity =
+                yearlyExpenseFilterForExpenseScreen
+                    .map((e) => e['itemQuantity'])
+                    .toList();
+            var totalYearlyExpenseSum = 0.0;
+            for (int xx = 0; xx < listOfYearlyExpenseItemPrice.length; xx++) {
+              totalYearlyExpenseSum +=
+                  (double.parse(listOfYearlyExpenseItemPrice[xx]) *
+                      double.parse(listOfYearlyExpenseItemQuantity[xx]));
             }
-            var totalMonthlyExpenses =
-                dailyExpense.map((e) => e['itemPrice']).toList();
-            var totalMonthlyExpensesQuantity =
-                dailyExpense.map((e) => e['itemQuantity']).toList();
-            var totMonthlyExpenseSum = 0.0;
-            for (int xx = 0; xx < totalMonthlyExpenses.length; xx++) {
-              totMonthlyExpenseSum += (double.parse(totalMonthlyExpenses[xx]) *
-                  double.parse(totalMonthlyExpensesQuantity[xx]));
+            var listOfMonthlyExpenseItemPrice =
+                dailyExpenseFilterForExpenseScreen
+                    .map((e) => e['itemPrice'])
+                    .toList();
+            var listOfMonthlyExpenseItemQuantity =
+                dailyExpenseFilterForExpenseScreen
+                    .map((e) => e['itemQuantity'])
+                    .toList();
+            var totalMonthlyExpenseSum = 0.0;
+            for (int xx = 0; xx < listOfMonthlyExpenseItemPrice.length; xx++) {
+              totalMonthlyExpenseSum +=
+                  (double.parse(listOfMonthlyExpenseItemPrice[xx]) *
+                      double.parse(listOfMonthlyExpenseItemQuantity[xx]));
             }
+
+            Provider.of<DataProvider>(context, listen: false).expenseList =
+                yearlyExpenseFilterForExpenseScreen;
             return Column(
               children: [
                 Expanded(
@@ -131,11 +141,11 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Daily Expense: $totMonthlyExpenseSum ',
+                                  'Daily Expense: $totalMonthlyExpenseSum ',
                                   style: dailyIncomeStyle,
                                 ),
                                 Text(
-                                  'Total Expense: $totExpenseSum',
+                                  'Total Expense: $totalYearlyExpenseSum',
                                   style: dailyIncomeStyle,
                                 ),
                               ],
@@ -149,7 +159,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 ),
                 Expanded(
                   flex: 12,
-                  child: dailyExpense.isEmpty
+                  child: dailyExpenseFilterForExpenseScreen.isEmpty
                       ? Image.asset(
                           'images/empty.png',
                           width: 300,
@@ -160,7 +170,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                 color: Colors.red,
                               ),
                             )
-                          : ExpenseItem(dailyExpense: dailyExpense),
+                          : ExpenseItem(
+                              dailyExpense: dailyExpenseFilterForExpenseScreen),
                 ),
               ],
             );
@@ -175,12 +186,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               ),
             );
           },
-          button_2: () {
-            setState(() {
-              Provider.of<FileHandlerForExpense>(context, listen: false)
-                  .createTable();
-            });
-          },
           button_3: () {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -188,7 +193,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               ),
             );
           },
-          button_4: () {},
         ),
       ),
     );

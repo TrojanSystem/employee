@@ -275,16 +275,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         var v4Crypto =
                             uuid.v4(options: {'rng': UuidUtil.cryptoRNG});
                         Provider.of<DataProvider>(context, listen: false)
-                            .loggedUseUniqueID = v4Crypto;
+                            .uniqueID(v4Crypto);
                         setState(() {
                           _isRegistering = false;
                         });
                         FirebaseFirestore.instance
                             .collection('LoggedUser')
-                            .doc(v4Crypto)
+                            .doc(v4Crypto.toString())
                             .set({
-                          'userNameID': v4Crypto,
-                          'username': username,
+                          'userNameID': v4Crypto.toString(),
+                          'username': username.toString(),
                           'userEmail': userEmail,
                           'loggedDate': DateTime.now().toString()
                         });
@@ -309,7 +309,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     color: Colors.red,
                                     fontWeight: FontWeight.w900),
                               ),
-                              content: Text(e, overflow: TextOverflow.visible),
+                              content: Text(e.toString(),
+                                  overflow: TextOverflow.visible),
                               actions: [
                                 TextButton(
                                     onPressed: () {

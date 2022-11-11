@@ -25,7 +25,10 @@ class _MonthProgressExpenseItemState extends State<MonthProgressExpenseItem> {
         .where((element) =>
             DateTime.parse(element['itemDate']).year == DateTime.now().year)
         .toList();
-    var todayFilteredExpenseList = monthFilterList
+    var monthlyExpenseType = monthFilterList
+        .where((element) => element['expenseType'] == 'employee')
+        .toList();
+    var todayFilteredExpenseList = monthlyExpenseType
         .where((element) =>
             DateTime.parse(element['itemDate']).month == selectedMonth)
         .toList();

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class DataProvider extends ChangeNotifier {
-  final List<Map<String, dynamic>> expenseList = [];
+  List<QueryDocumentSnapshot<Object>> expenseList = [];
   String loggedUserEmail = '';
   String loggedUseUniqueID = '';
   String loggedUserName = '';
@@ -21,7 +21,6 @@ class DataProvider extends ChangeNotifier {
 
   uniqueID(String ID) {
     loggedUseUniqueID = ID;
-
     notifyListeners();
   }
 
@@ -49,18 +48,18 @@ class DataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void loadExpenseList() async {
-    notifyListeners();
-    await for (var y in FirebaseFirestore.instance
-        .collection('EmployeeExpenses')
-        .snapshots()) {
-      for (var snapSell in y.docs) {
-        notifyListeners();
-        expenseList.add(snapSell.data());
-      }
-    }
-    notifyListeners();
-  }
+  // void loadExpenseList() async {
+  //   notifyListeners();
+  //   await for (var y in FirebaseFirestore.instance
+  //       .collection('EmployeeExpenses')
+  //       .snapshots()) {
+  //     for (var snapSell in y.docs) {
+  //       notifyListeners();
+  //       expenseList.add(snapSell.data());
+  //     }
+  //   }
+  //   notifyListeners();
+  // }
 
   void loadLoggedUser() async {
     notifyListeners();

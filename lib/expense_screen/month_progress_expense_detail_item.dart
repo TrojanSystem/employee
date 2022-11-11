@@ -37,7 +37,7 @@ class MonthProgressExpenseDetailItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            margin: const EdgeInsets.only(left: 18.0, bottom: 10),
+            margin: const EdgeInsets.only(left: 25.0, bottom: 10),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -56,7 +56,7 @@ class MonthProgressExpenseDetailItem extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 8.0),
                     child: SizedBox(
                       height: 25,
-                      width: 250,
+                      width: MediaQuery.of(context).size.width * 0.7,
                       child: FAProgressBar(
                         backgroundColor: Colors.black12,
                         size: 20,
@@ -74,17 +74,6 @@ class MonthProgressExpenseDetailItem extends StatelessWidget {
                     ),
                   ),
                 ]),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 18.0),
-            child: IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.cancel_outlined,
-                color: Colors.red,
-                size: 30,
-              ),
-            ),
           ),
         ],
       ),

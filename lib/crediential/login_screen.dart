@@ -217,6 +217,7 @@ class _LoginDemoState extends State<LoginDemo> {
                 onTap: () async {
                   if (formKey.currentState.validate()) {
                     formKey.currentState.save();
+
                     setState(() {
                       _isLoading = true;
                     });
@@ -229,21 +230,26 @@ class _LoginDemoState extends State<LoginDemo> {
                         setState(() {
                           _isLoading = false;
                         });
-                        String v4Crypto =
+                        String userID = '';
+                        String userName = '';
+                        List userV4Crypto =
                             Provider.of<DataProvider>(context, listen: false)
-                                .loggedUseUniqueID;
-                        String userName =
-                            Provider.of<DataProvider>(context, listen: false)
-                                .loggedUserName;
+                                .loggedUserList;
+                        for (var checker in userV4Crypto) {
+                          userID = checker['userNameID'];
+                          userName = checker['username'];
+                        }
+
                         FirebaseFirestore.instance
                             .collection('LoggedUser')
-                            .doc(v4Crypto)
-                            .set({
-                          'userNameID': v4Crypto,
-                          'username': userName,
+                            .doc(userID)
+                            .update({
+                          'userNameID': userID.toString(),
+                          'username': userName.toString(),
                           'userEmail': userEmail,
                           'loggedDate': DateTime.now().toString()
                         });
+
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
                             builder: (ctx) => HomePage(),
