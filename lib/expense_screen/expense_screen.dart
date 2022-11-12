@@ -70,13 +70,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                         selectedDayOfMonth)
                     .toList();
             var listOfYearlyExpenseItemPrice =
-                yearlyExpenseFilterForExpenseScreen
-                    .map((e) => e['itemPrice'])
-                    .toList();
+                dailyExpenseType.map((e) => e['itemPrice']).toList();
             var listOfYearlyExpenseItemQuantity =
-                yearlyExpenseFilterForExpenseScreen
-                    .map((e) => e['itemQuantity'])
-                    .toList();
+                dailyExpenseType.map((e) => e['itemQuantity']).toList();
             var totalYearlyExpenseSum = 0.0;
             for (int xx = 0; xx < listOfYearlyExpenseItemPrice.length; xx++) {
               totalYearlyExpenseSum +=
