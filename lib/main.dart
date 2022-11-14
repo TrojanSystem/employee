@@ -1,9 +1,9 @@
 import 'package:ada_bread/data_provider.dart';
+import 'package:ada_bread/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'crediential/login_screen.dart';
 import 'data_storage.dart';
 import 'expense_screen/data_storage/expenses_data.dart';
 import 'order_screen/order_data_hub.dart';
@@ -32,7 +32,7 @@ void main() async {
       ],
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: LoginDemo(),
+        home: MyCustomSplashScreen(),
       ),
     ),
   );
